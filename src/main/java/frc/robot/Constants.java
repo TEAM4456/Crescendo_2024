@@ -8,7 +8,10 @@ import java.util.HashMap;
 
 import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -153,5 +156,12 @@ public final class Constants {
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
 
     public static final HashMap<String, Command> AUTO_EVENT_MAP = new HashMap<>();
+  }
+
+  public static final class VisionConstants {
+    public static final Transform3d ROBOT_TO_LIMELIGHT1 = new Transform3d(
+        new Translation3d(1, 1, 1), new Rotation3d(0, Math.toRadians(0), 0));
+    public static final Transform3d ROBOT_TO_LIMELIGHT2 = new Transform3d(
+        new Translation3d(1, 1, 1), new Rotation3d(0, Math.toRadians(0), 0));
   }
 }

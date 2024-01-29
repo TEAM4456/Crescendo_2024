@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.Subsystems;
+//import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix.sensors.CANCoder;
 //import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.CANSparkMax;

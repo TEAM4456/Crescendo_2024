@@ -83,6 +83,8 @@ public class Swerve extends SubsystemBase {
                     stateStdDevs,
                     visionStdDevs);
 
+    
+    camera = new PhotonCamera("limelight");
     photonPose = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, Constants.VisionConstants.ROBOT_TO_LIMELIGHT1);
     photonPose.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 

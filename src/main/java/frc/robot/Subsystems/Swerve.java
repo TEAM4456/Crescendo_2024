@@ -1,10 +1,7 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.Subsystems;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -23,9 +20,11 @@ import edu.wpi.first.math.VecBuilder;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.Odometry;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -49,6 +48,7 @@ public class Swerve extends SubsystemBase {
   public Field2d field;
 
   private double lastEstTimestamp = 0;
+  private AtomicReference<EstimatedRobotPose> atomicEstimatedRobotPose;
 
   public Swerve() {
     m_gyro = new AHRS(SPI.Port.kMXP);
@@ -87,6 +87,7 @@ public class Swerve extends SubsystemBase {
     camera = new PhotonCamera("limelight");
     photonPose = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, Constants.VisionConstants.ROBOT_TO_LIMELIGHT1);
     photonPose.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+    this.atomicEstimatedRobotPose = new AtomicReference<EstimatedRobotPose>();
 
     SmartDashboard.putData("Field", field);
     AutoBuilder.configureHolonomic(
@@ -217,12 +218,8 @@ public class Swerve extends SubsystemBase {
       }
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-  var visionEst = photonPose.update();
-  double latestTimestamp = camera.getLatestResult().getTimestampSeconds();
-  boolean newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
-  if (newResult)
-    lastEstTimestamp = latestTimestamp;
+ public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+  var visionEst = photonPose.update(camera.getLatestResult());
   return visionEst;
   }
 
@@ -230,7 +227,7 @@ public class Swerve extends SubsystemBase {
   public void periodic() {
     swervePoseEstimator.update(getRotation2d(), getModulePositions());
 
-    var result = getEstimatedGlobalPose();
+    Optional<EstimatedRobotPose> result = getEstimatedGlobalPose();
     if (result.isPresent()) {
         var imageCaptureTime = result.get().timestampSeconds;
         var estPose = result.get().estimatedPose;
@@ -251,10 +248,12 @@ public class Swerve extends SubsystemBase {
     SmartDashboard.putNumber("poseX", field.getRobotPose().getX());
     SmartDashboard.putNumber("poseY", field.getRobotPose().getY());
     SmartDashboard.putNumber("NAVX Heading", this.getHeading());
-
-    SmartDashboard.putNumber("Vision Estimate X", getEstimatedGlobalPose().get().estimatedPose.getX());
-    SmartDashboard.putNumber("Vision Estimate Y", getEstimatedGlobalPose().get().estimatedPose.getY());
-    SmartDashboard.putNumber("Vision Estimate Heading", getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle());
-    SmartDashboard.putBoolean("Has Target", getEstimatedGlobalPose().isPresent());
+    if(result.isPresent()){
+      SmartDashboard.putNumber("Vision Estimate X", getEstimatedGlobalPose().get().estimatedPose.getX());
+      SmartDashboard.putNumber("Vision Estimate Y", getEstimatedGlobalPose().get().estimatedPose.getY());
+      SmartDashboard.putNumber("Vision Estimate Heading", getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle());
+    }
+    SmartDashboard.putBoolean("Has Pose Target", getEstimatedGlobalPose().isPresent());
+    SmartDashboard.putBoolean("aprilTag found",camera.getLatestResult().hasTargets());
   }
 }

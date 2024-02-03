@@ -8,9 +8,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.TeleopSwerve;
+import frc.robot.Subsystems.Elevator;
+import frc.robot.Subsystems.Intake;
+import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.Swerve;
 import frc.robot.Commands.toggleSpeed;
-
+import frc.robot.Commands.FeedForward;
+import frc.robot.Commands.IntakeIn;
+import frc.robot.Commands.ShooterOn;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,6 +41,9 @@ public class RobotContainer {
 
   /* Subsystems */
   private final Swerve s_Swerve = new Swerve();
+  private final Intake intake = new Intake();
+  private final Shooter shooter = new Shooter();
+  private final Elevator elevator = new Elevator();
 
   private final SendableChooser<Command> chooser;
 
@@ -71,6 +79,15 @@ public class RobotContainer {
         () -> -driver.getRawAxis(translationAxis),
         () -> -driver.getRawAxis(strafeAxis),
         () -> driver.getRawAxis(rotationAxis)));
+
+    driver.a().whileTrue(new IntakeIn(intake));
+    driver.b().whileTrue(new FeedForward(shooter));
+    driver.x().toggleOnTrue(new ShooterOn(shooter));
+    driver.rightBumper().onTrue(elevator.setElevatorPositionUpCommand());
+    driver.leftBumper().onTrue(elevator.setElevatorPositionDownCommand());
+
+
+
   }
   public Swerve getSwerve(){
     return s_Swerve;

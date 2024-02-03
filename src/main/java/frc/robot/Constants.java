@@ -164,4 +164,19 @@ public final class Constants {
     public static final Transform3d ROBOT_TO_LIMELIGHT2 = new Transform3d(
         new Translation3d(1, 1, 1), new Rotation3d(0, Math.toRadians(0), 0));
   }
+
+  public static final class ElevatorPositions{
+    public static final double rightElevatorUp = 0;
+    public static final double rightElevatorDown = 0;
+
+    public static final double leftElevatorUp = 0;
+    public static final double leftElevatorDown = 0;
+  }
+  public static final class ShooterConstants{
+    public static final double feedSpeed = .1;
+    public static final double shootSpeed = .3;
+  }
+  public static final class IntakeConstants{
+    public static final double intakeSpeed = .3;
+  }
 }

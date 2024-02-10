@@ -85,8 +85,8 @@ public class Swerve extends SubsystemBase {
 
     
     camera = new PhotonCamera("limelight");
-    photonPose = new PhotonPoseEstimator(fieldLayout, PoseStrategy.LOWEST_AMBIGUITY, camera, Constants.VisionConstants.ROBOT_TO_LIMELIGHT1);
-    this.atomicEstimatedRobotPose = new AtomicReference<EstimatedRobotPose>();
+    photonPose = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, Constants.VisionConstants.ROBOT_TO_LIMELIGHT1);
+    photonPose.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
     SmartDashboard.putData("Field", field);
     AutoBuilder.configureHolonomic(
@@ -218,8 +218,7 @@ public class Swerve extends SubsystemBase {
   }
 
  public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-  var visionEst = photonPose.update(camera.getLatestResult());
-  return visionEst;
+  return photonPose.update();
   }
 
   @Override
@@ -248,11 +247,10 @@ public class Swerve extends SubsystemBase {
     SmartDashboard.putNumber("poseY", field.getRobotPose().getY());
     SmartDashboard.putNumber("NAVX Heading", this.getHeading());
     if(result.isPresent()){
-      SmartDashboard.putNumber("Vision Estimate X", getEstimatedGlobalPose().get().estimatedPose.getX());
-      SmartDashboard.putNumber("Vision Estimate Y", getEstimatedGlobalPose().get().estimatedPose.getY());
-      SmartDashboard.putNumber("Vision Estimate Heading", getEstimatedGlobalPose().get().estimatedPose.getRotation().getAngle());
+      SmartDashboard.putNumber("Vision Estimate X", result.get().estimatedPose.toPose2d().getX());
+      SmartDashboard.putNumber("Vision Estimate Y", result.get().estimatedPose.toPose2d().getY());
     }
-    SmartDashboard.putBoolean("Has Pose Target", getEstimatedGlobalPose().isPresent());
+    SmartDashboard.putBoolean("Has Pose Target", result.isPresent());
     SmartDashboard.putBoolean("aprilTag found",camera.getLatestResult().hasTargets());
   }
 }

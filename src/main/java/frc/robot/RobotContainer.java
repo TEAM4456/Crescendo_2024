@@ -1,6 +1,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.FollowPathHolonomic;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -41,9 +43,9 @@ public class RobotContainer {
 
   /* Subsystems */
   private final Swerve s_Swerve = new Swerve();
-  private final Intake intake = new Intake();
-  private final Shooter shooter = new Shooter();
-  private final Elevator elevator = new Elevator();
+  //private final Intake intake = new Intake();
+  //private final Shooter shooter = new Shooter();
+  //private final Elevator elevator = new Elevator();
 
   private final SendableChooser<Command> chooser;
 
@@ -79,13 +81,13 @@ public class RobotContainer {
         () -> -driver.getRawAxis(translationAxis),
         () -> -driver.getRawAxis(strafeAxis),
         () -> driver.getRawAxis(rotationAxis)));
-
+/* 
     driver.a().whileTrue(new IntakeIn(intake));
     driver.b().whileTrue(new FeedForward(shooter));
     driver.x().toggleOnTrue(new ShooterOn(shooter));
     driver.rightBumper().onTrue(elevator.setElevatorPositionUpCommand());
     driver.leftBumper().onTrue(elevator.setElevatorPositionDownCommand());
-
+*/
 
 
   }

@@ -1,6 +1,12 @@
 {
   "version": 1.0,
-  "startingPose": null,
+  "startingPose": {
+    "position": {
+      "x": 1.5,
+      "y": 5.58
+    },
+    "rotation": 0
+  },
   "command": {
     "type": "sequential",
     "data": {
@@ -8,13 +14,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Piece 2 Out"
+            "pathName": "Piece 1 Out"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Piece 2 Back"
+            "pathName": "Piece 1 Back"
           }
         }
       ]

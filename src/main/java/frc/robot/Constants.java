@@ -54,7 +54,7 @@ public final class Constants {
     public static final int driveContinuousCurrentLimit = 40;
 
     /* Angle Motor PID Values */
-    public static final double angleKP = 0.005;
+    public static final double angleKP = 0.01;
     public static final double angleKI = 0.0;
     public static final double angleKD = 0.0;
     public static final double angleKFF = 0.0;
@@ -160,7 +160,7 @@ public final class Constants {
 
   public static final class VisionConstants {
     public static final Transform3d ROBOT_TO_LIMELIGHT1 = new Transform3d(
-        new Translation3d(.42, 0,.1), new Rotation3d(180, Math.toRadians(-30), 0));
+        new Translation3d(-.42, 0,.1), new Rotation3d(Math.toRadians(30), Math.toRadians(0), Math.toRadians(180)));
     public static final Transform3d ROBOT_TO_LIMELIGHT2 = new Transform3d(
         new Translation3d(1, 1, 1), new Rotation3d(0, Math.toRadians(0), 0));
   }

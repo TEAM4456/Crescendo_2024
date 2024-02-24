@@ -13,11 +13,18 @@ import frc.robot.Commands.TeleopSwerve;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Shooter;
+import frc.robot.Subsystems.ShooterPivot;
 import frc.robot.Subsystems.Swerve;
 import frc.robot.Commands.toggleSpeed;
+import frc.robot.Commands.ElevatorDown;
+import frc.robot.Commands.ElevatorUp;
 import frc.robot.Commands.FeedForward;
 import frc.robot.Commands.IntakeIn;
+import frc.robot.Commands.ShooterAmp;
+import frc.robot.Commands.ShooterDown;
+import frc.robot.Commands.ShooterIntake;
 import frc.robot.Commands.ShooterOn;
+import frc.robot.Commands.ShooterUp;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -43,9 +50,9 @@ public class RobotContainer {
 
   /* Subsystems */
   private final Swerve s_Swerve = new Swerve();
-  //private final Intake intake = new Intake();
-  //private final Shooter shooter = new Shooter();
-  //private final Elevator elevator = new Elevator();
+  private final Shooter shooter = new Shooter();
+  private final Elevator elevator = new Elevator();
+  private final ShooterPivot shooterPivot = new ShooterPivot();
 
   private final SendableChooser<Command> chooser;
 
@@ -81,13 +88,24 @@ public class RobotContainer {
         () -> -driver.getRawAxis(translationAxis),
         () -> -driver.getRawAxis(strafeAxis),
         () -> driver.getRawAxis(rotationAxis)));
-/* 
-    driver.a().whileTrue(new IntakeIn(intake));
+ 
+   
+
     driver.b().whileTrue(new FeedForward(shooter));
     driver.x().toggleOnTrue(new ShooterOn(shooter));
+    driver.y().toggleOnTrue(new ShooterIntake(shooter));
+    driver.a().whileTrue(new ShooterAmp(shooter));
+
     driver.rightBumper().onTrue(elevator.setElevatorPositionUpCommand());
     driver.leftBumper().onTrue(elevator.setElevatorPositionDownCommand());
-*/
+    
+    driver.leftTrigger().whileTrue(new ShooterUp(shooterPivot));
+    driver.rightTrigger().whileTrue(new ShooterDown(shooterPivot));
+
+    driver.start().whileTrue(new ElevatorUp(elevator));
+    driver.back().whileTrue(new ElevatorDown(elevator));
+
+
 
 
   }

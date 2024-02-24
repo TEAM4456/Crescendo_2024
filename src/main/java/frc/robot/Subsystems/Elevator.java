@@ -1,17 +1,11 @@
 package frc.robot.Subsystems;
 
-import java.util.Optional;
-
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -28,12 +22,12 @@ public class Elevator extends SubsystemBase {
     private final SparkPIDController elevatorLeftPIDController;
 
   public Elevator() {
-    elevatorRight = new CANSparkMax(18,MotorType.kBrushless);
+    elevatorRight = new CANSparkMax(15,MotorType.kBrushless);
     elevatorRight.setOpenLoopRampRate(.5);
     elevatorRightEncoder = elevatorRight.getEncoder();
     elevatorRightPIDController = elevatorRight.getPIDController();
 
-    elevatorLeft = new CANSparkMax(17,MotorType.kBrushless);
+    elevatorLeft = new CANSparkMax(14,MotorType.kBrushless);
     elevatorLeft.setOpenLoopRampRate(.5);
     elevatorLeftEncoder = elevatorLeft.getEncoder();
     elevatorLeftPIDController = elevatorLeft.getPIDController();
@@ -50,6 +44,23 @@ public class Elevator extends SubsystemBase {
 
   }
     
+  public void elevatorUp(){
+    elevatorRight.set(-Constants.ElevatorPositions.elevatorSpeed);
+    elevatorLeft.set(Constants.ElevatorPositions.elevatorSpeed);
+  }
+  public void elevatorDown(){
+    elevatorRight.set(Constants.ElevatorPositions.elevatorSpeed);
+    elevatorLeft.set(-Constants.ElevatorPositions.elevatorSpeed);
+  }
+  public void elevatorStop(){
+    elevatorRight.set(0);
+    elevatorLeft.set(0);
+  }
+
+
+
+
+
   public void setElevatorPositionUp(){
     elevatorLeftPIDController.setReference(Constants.ElevatorPositions.leftElevatorUp, CANSparkMax.ControlType.kPosition);
     elevatorRightPIDController.setReference(Constants.ElevatorPositions.rightElevatorUp, CANSparkMax.ControlType.kPosition);
@@ -66,6 +77,7 @@ public class Elevator extends SubsystemBase {
   }
   @Override
   public void periodic() {
-
+    SmartDashboard.putNumber("elevatorPositionRight",elevatorRightEncoder.getPosition());
+    SmartDashboard.putNumber("elevatorPositionRight", elevatorLeftEncoder.getPosition());
 }
 }

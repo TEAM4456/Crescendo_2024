@@ -1,18 +1,10 @@
 package frc.robot.Subsystems;
 
-import java.util.Optional;
-
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -40,20 +32,25 @@ public class Shooter extends SubsystemBase {
 
   }
   public void shooterOn(){
-    shooter.set(Constants.ShooterConstants.shootSpeed);
+    shooter.set(-Constants.ShooterConstants.shootSpeed);
   }
   public void shooterOff(){
     shooter.set(0);
   }
+  public void shooterIntake(){
+    shooter.set(Constants.ShooterConstants.intakeSpeed);
+  }
+  public void shooterAmp(){
+    shooter.set(-Constants.ShooterConstants.ampSpeed);
+  }
 
   public void feedForward(){
-    feeder.set(Constants.ShooterConstants.feedSpeed);
+    feeder.set(-Constants.ShooterConstants.feedSpeed);
   }
   public void feedStop(){
     feeder.set(0);
   }
   @Override
   public void periodic() {
-
 }
 }

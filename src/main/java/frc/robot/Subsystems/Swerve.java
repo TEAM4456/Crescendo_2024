@@ -32,7 +32,6 @@ public class Swerve extends SubsystemBase {
 
   //private SwerveDriveOdometry swerveOdometry;
   private SwerveModule[] mSwerveMods;
-  private Vision vision;
   private SwerveDrivePoseEstimator swervePoseEstimator;
   //private PhotonPoseEstimator photonPose;
   //private PhotonCamera camera;
@@ -76,16 +75,6 @@ public class Swerve extends SubsystemBase {
                     stateStdDevs,
                     visionStdDevs);
 
-<<<<<<< HEAD
-    
-    camera = new PhotonCamera("limelight");
-    photonPose = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, Constants.VisionConstants.ROBOT_TO_LIMELIGHT1);
-    photonPose.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-=======
-    //camera = new PhotonCamera("limelight");
-    //photonPose = new PhotonPoseEstimator(fieldLayout, PoseStrategy.LOWEST_AMBIGUITY, camera, Constants.VisionConstants.ROBOT_TO_LIMELIGHT1);
-    //this.atomicEstimatedRobotPose = new AtomicReference<EstimatedRobotPose>();
->>>>>>> ecd09cf2a5eaba00340573a14cd048304503a148
 
     SmartDashboard.putData("Field", field);
     AutoBuilder.configureHolonomic(
@@ -236,25 +225,7 @@ public class Swerve extends SubsystemBase {
     swervePoseEstimator.update(getRotation2d(), getModulePositions());
 
      // Correct pose estimate with vision measurements
-    var visionEst = vision.getEstimatedGlobalPose();
-    visionEst.ifPresent(
-            est -> {
-                var estPose = est.estimatedPose.toPose2d();
-                // Change our trust in the measurement based on the tags we can see
-                var estStdDevs = vision.getEstimationStdDevs(estPose);
-
-                SmartDashboard.putNumber("est X", est.estimatedPose.toPose2d().getX());
-
-                addVisionMeasurement(
-                        est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-            });
-    SmartDashboard.putBoolean("Is PReset", visionEst.isPresent());
-    SmartDashboard.putBoolean("photonestimator present", vision.photonEstimator.update().isPresent());
-    SmartDashboard.putBoolean("getlatestrestults has target", vision.getLatestResult().hasTargets());
-    SmartDashboard.putNumber("pipeline index", vision.camera.getPipelineIndex());
-
-    field.setRobotPose(getPose());
-
+   
     for (SwerveModule mod : mSwerveMods) {
       SmartDashboard.putNumber(
           "Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
@@ -263,17 +234,6 @@ public class Swerve extends SubsystemBase {
       SmartDashboard.putNumber(
           "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
     }
-    SmartDashboard.putNumber("poseX", field.getRobotPose().getX());
-    SmartDashboard.putNumber("poseY", field.getRobotPose().getY());
-    SmartDashboard.putNumber("NAVX Heading", this.getHeading());
-<<<<<<< HEAD
-    if(result.isPresent()){
-      SmartDashboard.putNumber("Vision Estimate X", result.get().estimatedPose.toPose2d().getX());
-      SmartDashboard.putNumber("Vision Estimate Y", result.get().estimatedPose.toPose2d().getY());
-    }
-    SmartDashboard.putBoolean("Has Pose Target", result.isPresent());
-    SmartDashboard.putBoolean("aprilTag found",camera.getLatestResult().hasTargets());
-=======
->>>>>>> ecd09cf2a5eaba00340573a14cd048304503a148
+ 
   }
 }

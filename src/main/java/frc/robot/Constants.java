@@ -1,25 +1,11 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import java.util.HashMap;
 
 import com.revrobotics.CANSparkBase.IdleMode;
-
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -48,10 +34,10 @@ public final class Constants {
 
     public static final SwerveDriveKinematics swerveKinematics =
         new SwerveDriveKinematics(
-            new Translation2d(wheelBase / 2.0, trackWidth / 2.0),
-            new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
+            new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0),
             new Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
-            new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
+            new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
+            new Translation2d(wheelBase / 2.0, trackWidth / 2.0));
 
     /* Swerve Voltage Compensation */
     public static final double voltageComp = 12.0;
@@ -165,43 +151,33 @@ public final class Constants {
     public static final HashMap<String, Command> AUTO_EVENT_MAP = new HashMap<>();
   }
 
-<<<<<<< HEAD
-  public static final class VisionConstants {
-    public static final Transform3d ROBOT_TO_LIMELIGHT1 = new Transform3d(
-        new Translation3d(-.42, 0,.1), new Rotation3d(Math.toRadians(30), Math.toRadians(0), Math.toRadians(180)));
-    public static final Transform3d ROBOT_TO_LIMELIGHT2 = new Transform3d(
-        new Translation3d(1, 1, 1), new Rotation3d(0, Math.toRadians(0), 0));
-  }
-=======
-public static class Vision {
-        public static final String kCameraName = "photonvision";
-        // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
-        public static final Transform3d kRobotToCam =
-                new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0));
-
-        // The layout of the AprilTags on the field
-        public static final AprilTagFieldLayout kTagLayout =
-                AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
-
-        // The standard deviations of our vision estimated poses, which affect correction rate
-        // (Fake values. Experiment and determine estimation noise on an actual robot.)
-        public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
-        public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
-    }
->>>>>>> ecd09cf2a5eaba00340573a14cd048304503a148
-
   public static final class ElevatorPositions{
     public static final double rightElevatorUp = 0;
     public static final double rightElevatorDown = 0;
 
     public static final double leftElevatorUp = 0;
     public static final double leftElevatorDown = 0;
+
+    public static final double elevatorSpeed = .1;
   }
   public static final class ShooterConstants{
     public static final double feedSpeed = .1;
-    public static final double shootSpeed = .3;
+    public static final double shootSpeed = .70;
+    public static final double intakeSpeed = .35;
+    public static final double ampSpeed = .1;
   }
   public static final class IntakeConstants{
     public static final double intakeSpeed = 0.3;
+  }
+
+  public static final class ShooterPivotPositions{
+    public static final double shooterPivotSpeed = .1;
+    public static final double shooterPositionIntake = -105.7;
+    public static final double shooterPositionShootCenter = -26
+    ;
+    public static final double shooterPositionShootSide = -16.38;
+    public static final double shooterPositionamp = 0;
+    public static final double shooterPositionTrapDoor = 0;
+
   }
 }

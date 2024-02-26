@@ -174,7 +174,7 @@ public final class Constants {
 
     public static final double intakePosition = 0;
     public static final double feedPosition = 0;
-    public static final double pulleySpeed = .8
+    public static final double pulleySpeed = .45
     ;
   }
 

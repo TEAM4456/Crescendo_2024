@@ -113,6 +113,7 @@ public class RobotContainer {
     second.rightTrigger().whileTrue(new MoveIntakeIn(intakePulley));
     second.leftTrigger().whileTrue(new MoveIntakeOut(intakePulley));
     second.a().toggleOnTrue(new IntakeIn(intake));
+    second.b().whileTrue(new FeedForward(shooter));
 
 
   }

@@ -15,7 +15,7 @@ public class ElevatorDown extends Command{
     public void execute() {
         elevator.elevatorDown();
       }
-    
+
       // Called once the command ends or is interrupted.
       @Override
       public void end(boolean interrupted) {

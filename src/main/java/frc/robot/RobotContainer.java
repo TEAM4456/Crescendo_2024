@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.TeleopSwerve;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
+import frc.robot.Subsystems.IntakePulley;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.ShooterPivot;
 import frc.robot.Subsystems.Swerve;
@@ -20,6 +21,8 @@ import frc.robot.Commands.ElevatorDown;
 import frc.robot.Commands.ElevatorUp;
 import frc.robot.Commands.FeedForward;
 import frc.robot.Commands.IntakeIn;
+import frc.robot.Commands.MoveIntakeIn;
+import frc.robot.Commands.MoveIntakeOut;
 import frc.robot.Commands.ShooterAmp;
 import frc.robot.Commands.ShooterDown;
 import frc.robot.Commands.ShooterIntake;
@@ -35,7 +38,7 @@ import frc.robot.Commands.ShooterUp;
 public class RobotContainer {
   /* Controllers */
   private final CommandXboxController driver = new CommandXboxController(0);
-  //private final CommandXboxController second = new CommandXboxController(1);
+  private final CommandXboxController second = new CommandXboxController(1);
 
   /* Drive Controls */
   private final int translationAxis = XboxController.Axis.kLeftY.value;
@@ -53,6 +56,8 @@ public class RobotContainer {
   private final Shooter shooter = new Shooter();
   private final Elevator elevator = new Elevator();
   private final ShooterPivot shooterPivot = new ShooterPivot();
+  private final IntakePulley intakePulley = new IntakePulley();
+  private final Intake intake = new Intake();
 
   private final SendableChooser<Command> chooser;
 
@@ -96,8 +101,8 @@ public class RobotContainer {
     driver.y().toggleOnTrue(new ShooterIntake(shooter));
     driver.a().whileTrue(new ShooterAmp(shooter));
 
-    driver.rightBumper().onTrue(elevator.setElevatorPositionUpCommand());
-    driver.leftBumper().onTrue(elevator.setElevatorPositionDownCommand());
+    driver.rightBumper().whileTrue(new ElevatorUp(elevator));
+    driver.leftBumper().whileTrue(new ElevatorDown(elevator));
     
     driver.leftTrigger().whileTrue(new ShooterUp(shooterPivot));
     driver.rightTrigger().whileTrue(new ShooterDown(shooterPivot));
@@ -105,7 +110,9 @@ public class RobotContainer {
     driver.start().whileTrue(new ElevatorUp(elevator));
     driver.back().whileTrue(new ElevatorDown(elevator));
 
-
+    second.rightTrigger().whileTrue(new MoveIntakeIn(intakePulley));
+    second.leftTrigger().whileTrue(new MoveIntakeOut(intakePulley));
+    second.a().toggleOnTrue(new IntakeIn(intake));
 
 
   }
@@ -121,7 +128,6 @@ public class RobotContainer {
   
 
   public Command getAutonomousCommand() {
-    s_Swerve.zeroHeading();
     s_Swerve.resetModulesToAbsolute();
     return chooser.getSelected();
     //return null;

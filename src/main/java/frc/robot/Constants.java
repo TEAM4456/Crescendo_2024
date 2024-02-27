@@ -170,7 +170,7 @@ public final class Constants {
     public static final double ampSpeed = .25;
   }
   public static final class IntakeConstants{
-    public static final double intakeSpeed = 0.3;
+    public static final double intakeSpeed = 0.5;
 
     public static final double intakePosition = -33.9;
     public static final double feedPosition = 0;

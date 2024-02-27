@@ -8,18 +8,12 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Piece 2 Out"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Piece 2 Back"
+            "pathName": "Source 1"
           }
         }
       ]
     }
   },
-  "folder": "Starting Autos",
+  "folder": "Source Auto",
   "choreoAuto": false
 }

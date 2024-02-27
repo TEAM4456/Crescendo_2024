@@ -1,9 +1,15 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathHolonomic;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -20,6 +26,7 @@ import frc.robot.Commands.toggleSpeed;
 import frc.robot.Commands.ElevatorDown;
 import frc.robot.Commands.ElevatorUp;
 import frc.robot.Commands.FeedForward;
+import frc.robot.Commands.FeedForwardContinuous;
 import frc.robot.Commands.IntakeIn;
 import frc.robot.Commands.MoveIntakeIn;
 import frc.robot.Commands.MoveIntakeOut;
@@ -27,6 +34,8 @@ import frc.robot.Commands.ShooterAmp;
 import frc.robot.Commands.ShooterDown;
 import frc.robot.Commands.ShooterIntake;
 import frc.robot.Commands.ShooterOn;
+import frc.robot.Commands.ShooterOnContinuous;
+import frc.robot.Commands.ShooterPositionCenter;
 import frc.robot.Commands.ShooterUp;
 
 /**
@@ -60,6 +69,7 @@ public class RobotContainer {
   private final Intake intake = new Intake();
 
   private final SendableChooser<Command> chooser;
+  private final SendableChooser<Command> shooterChooser;
 
 
   /** The container for the robot. Contains subsystems, OI devices, and Commands. */
@@ -72,8 +82,24 @@ public class RobotContainer {
             () -> -driver.getRawAxis(strafeAxis),
             () -> driver.getRawAxis(rotationAxis)));
 
+
+    //Pathplanner Auto Components
+
+    
+
+    NamedCommands.registerCommand("Shooter On", new ShooterOnContinuous(shooter));
+    NamedCommands.registerCommand("Feed Forward", new FeedForwardContinuous(shooter));
+    NamedCommands.registerCommand("Shooter Position Center", shooterPivot.shooterPositionCenterCommand());
+
     chooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto:", chooser);
+
+    shooterChooser = new SendableChooser<Command>();
+
+
+
+
+
     // Configure the button bindings
     configureButtonBindings();  
   }
@@ -83,9 +109,68 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
+
+
+
+
+
+
+
+    public Command SpeakerCenterSequence(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+           shooterPivot.shooterPositionCenterCommand(),
+           AutoBuilder.followPath(PathPlannerPath.fromPathFile("Speaker Front")),
+           new InstantCommand(()->shooter.shooterOn())
+           ),
+          new FeedForwardContinuous(shooter)
+      );
+    }
+     public Command SpeakerRightSequence(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+           shooterPivot.shooterPositionCornerCommand(),
+           AutoBuilder.followPath(PathPlannerPath.fromPathFile("Speaker Right")),
+           new InstantCommand(()->shooter.shooterOn())
+           ),
+          new FeedForwardContinuous(shooter)
+      );
+    }
+    public Command SpeakerLeftSequence(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+           shooterPivot.shooterPositionCornerCommand(),
+           AutoBuilder.followPath(PathPlannerPath.fromPathFile("Speaker Left")),
+           new InstantCommand(()->shooter.shooterOn())
+           ),
+          new FeedForwardContinuous(shooter)
+      );
+    }
+
+
+    public Command stopMotors(){
+      return new SequentialCommandGroup(
+        new InstantCommand(()-> shooter.feedStop()),
+        new InstantCommand(()-> shooter.shooterOff())
+      );
+    }
+
+     public Command Source1Sequence(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+           shooterPivot.shooterPositionSourceCommand(),
+           AutoBuilder.followPath(PathPlannerPath.fromPathFile("Source 1")),
+           new InstantCommand(()->shooter.shooterIntake())
+           )
+      );
+    }
+    
+    
+
+
   
   private void configureButtonBindings() {
-       
+    shooterChooser.addOption("Score Center",SpeakerCenterSequence());
     /* Driver Buttons */
     driver.back().toggleOnTrue(
       new toggleSpeed(
@@ -101,8 +186,8 @@ public class RobotContainer {
     driver.y().toggleOnTrue(new ShooterIntake(shooter));
     driver.a().whileTrue(new ShooterAmp(shooter));
 
-    driver.rightBumper().whileTrue(new ElevatorUp(elevator));
-    driver.leftBumper().whileTrue(new ElevatorDown(elevator));
+    driver.rightBumper().whileTrue(elevator.setElevatorPositionUpCommand());
+    driver.leftBumper().whileTrue(elevator.setElevatorPositionDownCommand());
     
     driver.leftTrigger().whileTrue(new ShooterUp(shooterPivot));
     driver.rightTrigger().whileTrue(new ShooterDown(shooterPivot));
@@ -112,8 +197,21 @@ public class RobotContainer {
 
     second.rightTrigger().whileTrue(new MoveIntakeIn(intakePulley));
     second.leftTrigger().whileTrue(new MoveIntakeOut(intakePulley));
-    second.a().toggleOnTrue(new IntakeIn(intake));
-    second.b().whileTrue(new FeedForward(shooter));
+
+
+
+    second.rightBumper().whileTrue(shooterPivot.shooterPositionDownCommand());
+    second.leftBumper().whileTrue(shooterPivot.shooterPositionUpCommand());
+
+
+    second.start().whileTrue(stopMotors());
+
+    second.back().toggleOnTrue(SpeakerRightSequence());
+    second.b().toggleOnTrue(SpeakerLeftSequence());
+    second.x().toggleOnTrue(SpeakerCenterSequence());
+
+    second.a().toggleOnTrue(Source1Sequence());
+
 
 
   }

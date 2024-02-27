@@ -3,53 +3,47 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.5,
-        "y": 5.58
+        "x": 1.693661124729351,
+        "y": 3.7631842728590494
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.5,
-        "y": 5.58
+        "x": 1.7089318562041238,
+        "y": 3.7631842728590494
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.45,
-        "y": 5.58
+        "x": 0.73073282397597,
+        "y": 4.350502243531324
       },
       "prevControl": {
-        "x": 1.4500000000000002,
-        "y": 5.58
+        "x": 0.7307328239734977,
+        "y": 4.350502243531324
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.5,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 2.0,
+    "maxAcceleration": 1.5,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 360.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": -59.57421619803873,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Auto Paths",
+  "folder": "Speaker Autos",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

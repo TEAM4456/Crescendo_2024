@@ -25,10 +25,10 @@ public class ShooterPivot extends SubsystemBase {
 
    
 
-    pivotMotorPIDController.setP(1);
-    pivotMotorPIDController.setP(0);
-    pivotMotorPIDController.setP(0);
-    pivotMotorPIDController.setP(0);
+    pivotMotorPIDController.setP(.1);
+    pivotMotorPIDController.setI(0);
+    pivotMotorPIDController.setD(0);
+    pivotMotorPIDController.setFF(0);
 
   
 
@@ -46,6 +46,42 @@ public class ShooterPivot extends SubsystemBase {
     pivotMotor.set(0);
     pivotMotor.set(0);
   }
+
+  public void shooterPositionDown(){
+    pivotMotorPIDController.setReference(Constants.ShooterPivotPositions.shooterPositionDown, CANSparkMax.ControlType.kPosition);
+  }
+  public void shooterPositionCorner(){
+    pivotMotorPIDController.setReference(Constants.ShooterPivotPositions.shooterPositionShootSide, CANSparkMax.ControlType.kPosition);
+  }
+   public void shooterPositionCenter(){
+    pivotMotorPIDController.setReference(Constants.ShooterPivotPositions.shooterPositionShootCenter, CANSparkMax.ControlType.kPosition);
+   }
+  public void shooterPositionUp(){
+    pivotMotorPIDController.setReference(Constants.ShooterPivotPositions.shooterPositionUp+2, CANSparkMax.ControlType.kPosition);
+  }
+  public void shooterPositionSource(){
+    pivotMotorPIDController.setReference(Constants.ShooterPivotPositions.shooterPositionSource, CANSparkMax.ControlType.kPosition);
+  }
+
+  
+  public Command shooterPositionDownCommand(){
+    return run(() -> shooterPositionDown()).until(() -> (Math.abs(pivotMotorEncoder.getPosition() - Constants.ShooterPivotPositions.shooterPositionDown) < 1));
+  }
+  public Command shooterPositionUpCommand(){
+    return run(() -> shooterPositionUp()).until(() -> (Math.abs(pivotMotorEncoder.getPosition() - Constants.ShooterPivotPositions.shooterPositionUp) < 1));
+  }
+  public Command shooterPositionCenterCommand(){
+    return run(() -> shooterPositionCenter()).until(() -> (Math.abs(pivotMotorEncoder.getPosition() - Constants.ShooterPivotPositions.shooterPositionShootCenter) < 1));
+  }
+  public Command shooterPositionCornerCommand(){
+    return run(() -> shooterPositionCorner()).until(() -> (Math.abs(pivotMotorEncoder.getPosition() - Constants.ShooterPivotPositions.shooterPositionShootSide) < 1));
+  }
+  public Command shooterPositionSourceCommand(){
+    return run(() -> shooterPositionSource()).until(() -> (Math.abs(pivotMotorEncoder.getPosition() - Constants.ShooterPivotPositions.shooterPositionSource) < 1));
+  }
+ 
+
+
 
 
 

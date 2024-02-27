@@ -1,0 +1,44 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Speaker Right"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShooterPositionCorner"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShooterOnContinuous"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "FeedForwardContinuous"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Speaker Autos",
+  "choreoAuto": false
+}

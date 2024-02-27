@@ -8,18 +8,12 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Piece 2 Out"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Piece 2 Back"
+            "pathName": "Speaker Front"
           }
         }
       ]
     }
   },
-  "folder": "Starting Autos",
+  "folder": "Speaker Autos",
   "choreoAuto": false
 }

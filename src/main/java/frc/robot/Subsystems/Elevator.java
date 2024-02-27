@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -33,14 +34,14 @@ public class Elevator extends SubsystemBase {
     elevatorLeftPIDController = elevatorLeft.getPIDController();
 
     elevatorRightPIDController.setP(1);
-    elevatorRightPIDController.setP(0);
-    elevatorRightPIDController.setP(0);
-    elevatorRightPIDController.setP(0);
+    elevatorRightPIDController.setI(0);
+    elevatorRightPIDController.setD(0);
+    elevatorRightPIDController.setFF(0);
 
     elevatorLeftPIDController.setP(1);
-    elevatorLeftPIDController.setP(0);
-    elevatorLeftPIDController.setP(0);
-    elevatorLeftPIDController.setP(0);
+    elevatorLeftPIDController.setI(0);
+    elevatorLeftPIDController.setD(0);
+    elevatorLeftPIDController.setFF(0);
 
   }
     

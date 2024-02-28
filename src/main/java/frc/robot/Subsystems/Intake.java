@@ -15,11 +15,30 @@ public class Intake extends SubsystemBase {
     private RelativeEncoder intakeEncoder;
     private final SparkPIDController intakePIDController;
 
+
+    private CANSparkMax intakeFeed;
+    private RelativeEncoder intakeFeedEncoder;
+    private final SparkPIDController intakeFeedPIDController;
+
   public Intake() {
     intake = new CANSparkMax(16,MotorType.kBrushless);
     intakeEncoder = intake.getEncoder();
     intakePIDController = intake.getPIDController();
 
+    intakeFeed = new CANSparkMax(22,MotorType.kBrushless);
+    intakeFeedEncoder = intake.getEncoder();
+    intakeFeedPIDController = intake.getPIDController();
+
+
+  }
+  public void intakeFeedForward(){
+    intakeFeed.set(-Constants.IntakeConstants.intakeFeedSpeed);
+  }
+  public void intakeFeedBack(){
+    intakeFeed.set(Constants.IntakeConstants.intakeFeedSpeed);
+  }
+  public void intakeFeedStop(){
+    intakeFeed.set(0);
   }
   public void speedForward(){
     intake.set(Constants.IntakeConstants.intakeSpeed);

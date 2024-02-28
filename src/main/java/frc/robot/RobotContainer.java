@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -28,6 +30,7 @@ import frc.robot.Commands.ElevatorUp;
 import frc.robot.Commands.FeedForward;
 import frc.robot.Commands.FeedForwardContinuous;
 import frc.robot.Commands.IntakeIn;
+import frc.robot.Commands.IntakeInContinuous;
 import frc.robot.Commands.MoveIntakeIn;
 import frc.robot.Commands.MoveIntakeOut;
 import frc.robot.Commands.ShooterAmp;
@@ -47,7 +50,8 @@ import frc.robot.Commands.ShooterUp;
 public class RobotContainer {
   /* Controllers */
   private final CommandXboxController driver = new CommandXboxController(0);
-  private final CommandXboxController second = new CommandXboxController(1);
+  private final CommandXboxController buttonBoard = new CommandXboxController(1);
+  private final CommandXboxController backupManual = new CommandXboxController(2);
 
   /* Drive Controls */
   private final int translationAxis = XboxController.Axis.kLeftY.value;
@@ -69,7 +73,7 @@ public class RobotContainer {
   private final Intake intake = new Intake();
 
   private final SendableChooser<Command> chooser;
-  private final SendableChooser<Command> shooterChooser;
+
 
 
   /** The container for the robot. Contains subsystems, OI devices, and Commands. */
@@ -85,16 +89,9 @@ public class RobotContainer {
 
     //Pathplanner Auto Components
 
-    
 
-    NamedCommands.registerCommand("Shooter On", new ShooterOnContinuous(shooter));
-    NamedCommands.registerCommand("Feed Forward", new FeedForwardContinuous(shooter));
-    NamedCommands.registerCommand("Shooter Position Center", shooterPivot.shooterPositionCenterCommand());
-
-    chooser = AutoBuilder.buildAutoChooser();
+    chooser = new SendableChooser<Command>();
     SmartDashboard.putData("Auto:", chooser);
-
-    shooterChooser = new SendableChooser<Command>();
 
 
 
@@ -115,7 +112,7 @@ public class RobotContainer {
 
 
 
-
+    //Speaker Sequences
     public Command SpeakerCenterSequence(){
       return new SequentialCommandGroup(
         new ParallelCommandGroup(
@@ -123,39 +120,48 @@ public class RobotContainer {
            AutoBuilder.followPath(PathPlannerPath.fromPathFile("Speaker Front")),
            new InstantCommand(()->shooter.shooterOn())
            ),
-          new FeedForwardContinuous(shooter)
+          new FeedForwardContinuous(shooter,intake)
       );
     }
-     public Command SpeakerRightSequence(){
-      return new SequentialCommandGroup(
-        new ParallelCommandGroup(
-           shooterPivot.shooterPositionCornerCommand(),
-           AutoBuilder.followPath(PathPlannerPath.fromPathFile("Speaker Right")),
-           new InstantCommand(()->shooter.shooterOn())
-           ),
-          new FeedForwardContinuous(shooter)
-      );
-    }
-    public Command SpeakerLeftSequence(){
+
+    public Command SpeakerRightSequence(){
       return new SequentialCommandGroup(
         new ParallelCommandGroup(
            shooterPivot.shooterPositionCornerCommand(),
            AutoBuilder.followPath(PathPlannerPath.fromPathFile("Speaker Left")),
            new InstantCommand(()->shooter.shooterOn())
            ),
-          new FeedForwardContinuous(shooter)
+          new FeedForwardContinuous(shooter,intake)
       );
     }
 
-
-    public Command stopMotors(){
+    public Command SpeakerLeftSequence(){
       return new SequentialCommandGroup(
-        new InstantCommand(()-> shooter.feedStop()),
-        new InstantCommand(()-> shooter.shooterOff())
+        new ParallelCommandGroup(
+           shooterPivot.shooterPositionCornerCommand(),
+           AutoBuilder.followPath(PathPlannerPath.fromPathFile("Speaker Right")),
+           new InstantCommand(()->shooter.shooterOn())
+           ),
+          new FeedForwardContinuous(shooter,intake)
       );
     }
 
-     public Command Source1Sequence(){
+
+    //Amp Sequence
+    public Command AmpScoreSequence(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+           shooterPivot.shooterPositionAmpCommand(),
+           AutoBuilder.followPath(PathPlannerPath.fromPathFile("Amp Score")),
+           new InstantCommand(()->shooter.shooterAmp())
+           ),
+          new FeedForwardContinuous(shooter,intake)
+      );
+    }
+
+   
+    //Source Sequences
+    public Command SourceFarSequence(){
       return new SequentialCommandGroup(
         new ParallelCommandGroup(
            shooterPivot.shooterPositionSourceCommand(),
@@ -164,13 +170,200 @@ public class RobotContainer {
            )
       );
     }
+    //Auto Sequences Pieces Center
+    public Command autoCenter2Piece(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+        stopMotors(),
+        new InstantCommand(()-> intake.speedForward()),
+        intakePulley.intakePositionGroundCommand(),
+        AutoBuilder.followPath(PathPlannerPath.fromPathFile("Piece 2 Out Center"))
+        ),
+        new ParallelCommandGroup(
+          new InstantCommand(()->shooter.shooterOn()),
+          shooterPivot.shooterPositionCenterCommand(),
+          intakePulley.intakePositionFeedCommand(),
+          AutoBuilder.followPath(PathPlannerPath.fromPathFile("Piece 2 Back Center"))
+        ),
+        new InstantCommand(()-> shooter.feedForward()),
+      new InstantCommand(() -> intake.intakeFeedForward()),
+      new InstantCommand(()-> intake.speedForward())
+        );
+    }
+    public Command autoCenter1Piece(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+        stopMotors(),
+        new InstantCommand(()-> intake.speedForward()),
+        intakePulley.intakePositionGroundCommand(),
+        AutoBuilder.followPath(PathPlannerPath.fromPathFile("Piece 1 Out Center"))
+        ),
+        new ParallelCommandGroup(
+          new InstantCommand(()->shooter.shooterOn()),
+          shooterPivot.shooterPositionCenterCommand(),
+          intakePulley.intakePositionFeedCommand(),
+          AutoBuilder.followPath(PathPlannerPath.fromPathFile("Piece 1 Back Center"))
+        ),
+        new InstantCommand(()-> shooter.feedForward()),
+      new InstantCommand(() -> intake.intakeFeedForward()),
+      new InstantCommand(()-> intake.speedForward())
+        );
+    }
+    public Command autoCenter3Piece(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+        stopMotors(),
+        new InstantCommand(()-> intake.speedForward()),
+        intakePulley.intakePositionGroundCommand(),
+        AutoBuilder.followPath(PathPlannerPath.fromPathFile("Piece 3 Out Center"))
+        ),
+        new ParallelCommandGroup(
+          new InstantCommand(()->shooter.shooterOn()),
+          shooterPivot.shooterPositionCenterCommand(),
+          intakePulley.intakePositionFeedCommand(),
+          AutoBuilder.followPath(PathPlannerPath.fromPathFile("Piece 3 Back Center"))
+        ),
+        new InstantCommand(()-> shooter.feedForward()),
+      new InstantCommand(() -> intake.intakeFeedForward()),
+      new InstantCommand(()-> intake.speedForward())
+        );
+    }
+
+    //center Autos
+    public Command autoCenter2(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+          shooterPivot.shooterPositionCenterCommand(),
+          new InstantCommand(()->shooter.shooterOn()),
+          intakePulley.intakePositionGroundCommand()
+      ),
+      new InstantCommand(()-> shooter.feedForward()),
+      new InstantCommand(() -> intake.intakeFeedForward()),
+      new InstantCommand(()-> intake.speedForward()),
+      new WaitCommand(1),
+      autoCenter2Piece()
+    );}
+
+    public Command autoCenter12(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+          shooterPivot.shooterPositionCenterCommand(),
+          new InstantCommand(()->shooter.shooterOn()),
+          intakePulley.intakePositionGroundCommand()
+      ),
+      new InstantCommand(()-> shooter.feedForward()),
+      new InstantCommand(() -> intake.intakeFeedForward()),
+      new InstantCommand(()-> intake.speedForward()),
+      new WaitCommand(.5),
+      autoCenter2Piece(),
+      new WaitCommand(1),
+      autoCenter1Piece()
+    );}
     
+    public Command autoCenter23(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+          shooterPivot.shooterPositionCenterCommand(),
+          new InstantCommand(()->shooter.shooterOn()),
+          intakePulley.intakePositionGroundCommand()
+      ),
+      new InstantCommand(()-> shooter.feedForward()),
+      new InstantCommand(() -> intake.intakeFeedForward()),
+      new InstantCommand(()-> intake.speedForward()),
+      new WaitCommand(.5),
+      autoCenter2Piece(),
+      new WaitCommand(1),
+      autoCenter3Piece()
+    );}
+
+
+    //Amp Side Auto 
+    public Command autoAmpSide1(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+          shooterPivot.shooterPositionCornerCommand(),
+          new InstantCommand(()->shooter.shooterOn()),
+          intakePulley.intakePositionGroundCommand()
+      ),
+      new InstantCommand(()-> shooter.feedForward()),
+      new InstantCommand(() -> intake.intakeFeedForward()),
+      new InstantCommand(()-> intake.speedForward()),
+      new WaitCommand(1),
+      new ParallelCommandGroup(
+        stopMotors(),
+        new InstantCommand(()-> intake.speedForward()),
+        AutoBuilder.followPath(PathPlannerPath.fromPathFile("Piece 1 Out Amp"))
+        ),
+        new ParallelCommandGroup(
+          new InstantCommand(()->shooter.shooterOn()),
+          shooterPivot.shooterPositionCornerCommand(),
+          intakePulley.intakePositionFeedCommand(),
+          AutoBuilder.followPath(PathPlannerPath.fromPathFile("Piece 1 Back Amp"))
+        ),
+        new InstantCommand(()-> shooter.feedForward()),
+      new InstantCommand(() -> intake.intakeFeedForward()),
+      new InstantCommand(()-> intake.speedForward())
+      );
+    }
+
+    //Source Side Auto
+     public Command autoSourceSide3(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+          shooterPivot.shooterPositionCornerCommand(),
+          new InstantCommand(()->shooter.shooterOn()),
+          intakePulley.intakePositionGroundCommand()
+      ),
+      new InstantCommand(()-> shooter.feedForward()),
+      new InstantCommand(() -> intake.intakeFeedForward()),
+      new InstantCommand(()-> intake.speedForward()),
+      new WaitCommand(.5),
+      new ParallelCommandGroup(
+        stopMotors(),
+        new InstantCommand(()-> intake.speedForward()),
+        AutoBuilder.followPath(PathPlannerPath.fromPathFile("Piece 3 Out Source"))
+        ),
+        new ParallelCommandGroup(
+          new InstantCommand(()->shooter.shooterOn()),
+          shooterPivot.shooterPositionCornerCommand(),
+          intakePulley.intakePositionFeedCommand(),
+          AutoBuilder.followPath(PathPlannerPath.fromPathFile("Piece 3 Back Source"))
+        ),
+        new InstantCommand(()-> shooter.feedForward()),
+        new InstantCommand(() -> intake.intakeFeedForward()),
+        new InstantCommand(()-> intake.speedForward())
+      );
+    }
+    
+
+    //stop Feed and Shoot Motors
+    public Command stopMotors(){
+      return new SequentialCommandGroup(
+        new InstantCommand(()-> shooter.feedStop()),
+        new InstantCommand(()-> shooter.shooterOff()),
+        new InstantCommand(()-> intake.intakeFeedStop())
+      );
+    }
+     public Command stopMotorsAll(){
+      return new SequentialCommandGroup(
+        new InstantCommand(()-> shooter.feedStop()),
+        new InstantCommand(()-> shooter.shooterOff()),
+        new InstantCommand(()-> intake.intakeFeedStop()),
+        new InstantCommand(()-> intake.speedStop())
+      );
+    }
     
 
 
   
   private void configureButtonBindings() {
-    shooterChooser.addOption("Score Center",SpeakerCenterSequence());
+    chooser.setDefaultOption("nothing", null);
+
+    chooser.addOption("Center 1-2",autoCenter12());
+    chooser.addOption("Center 2",autoCenter2());
+    chooser.addOption("Center 2-3",autoCenter23());
+    chooser.addOption("Amp Side 1",autoAmpSide1());
+    chooser.addOption("Source Side 3",autoSourceSide3());
     /* Driver Buttons */
     driver.back().toggleOnTrue(
       new toggleSpeed(
@@ -179,40 +372,46 @@ public class RobotContainer {
         () -> -driver.getRawAxis(strafeAxis),
         () -> driver.getRawAxis(rotationAxis)));
  
-   
+    driver.leftTrigger().whileTrue(elevator.setElevatorPositionDownCommand());
+    driver.rightTrigger().whileTrue(elevator.setElevatorPositionUpCommand());
 
-    driver.b().whileTrue(new FeedForward(shooter));
-    driver.x().toggleOnTrue(new ShooterOn(shooter));
-    driver.y().toggleOnTrue(new ShooterIntake(shooter));
-    driver.a().whileTrue(new ShooterAmp(shooter));
+    driver.rightBumper().whileTrue(new ElevatorUp(elevator));
+    driver.leftBumper().whileTrue(new ElevatorDown(elevator));
 
-    driver.rightBumper().whileTrue(elevator.setElevatorPositionUpCommand());
-    driver.leftBumper().whileTrue(elevator.setElevatorPositionDownCommand());
+
+    driver.b().whileTrue(shooterPivot.shooterPositionUpCommand());
+    driver.x().whileTrue(shooterPivot.shooterPositionDownCommand());
     
-    driver.leftTrigger().whileTrue(new ShooterUp(shooterPivot));
-    driver.rightTrigger().whileTrue(new ShooterDown(shooterPivot));
+    driver.y().whileTrue(new ShooterUp(shooterPivot));
+    driver.a
+    ().whileTrue(new ShooterDown(shooterPivot));
 
-    driver.start().whileTrue(new ElevatorUp(elevator));
-    driver.back().whileTrue(new ElevatorDown(elevator));
+    driver.start().whileTrue(stopMotorsAll());
 
-    second.rightTrigger().whileTrue(new MoveIntakeIn(intakePulley));
-    second.leftTrigger().whileTrue(new MoveIntakeOut(intakePulley));
+    //buttonBoard.a().whileTrue(SourceMidSequence()); Will be Source Middle
+    //buttonBoard.b().whileTrue(SourceCloseSequence());
+    buttonBoard.leftTrigger().whileTrue(SourceFarSequence());
 
-    second.y().whileTrue(new IntakeIn(intake));
+    buttonBoard.leftBumper().whileTrue(SpeakerLeftSequence());
+    buttonBoard.x().whileTrue(SpeakerCenterSequence());
+    buttonBoard.y().whileTrue(SpeakerRightSequence());
+
+    buttonBoard.rightBumper().whileTrue(AmpScoreSequence());
+    buttonBoard.rightTrigger().whileTrue(stopMotors());
+
+
+    backupManual.y().whileTrue(new ShooterOn(shooter));
+    backupManual.a().whileTrue(new FeedForward(shooter, intake));
+    backupManual.b().whileTrue(shooterPivot.shooterPositionCenterCommand());
+
+    backupManual.rightTrigger().whileTrue(intakePulley.intakePositionGroundCommand());
+    backupManual.leftTrigger().whileTrue(intakePulley.intakePositionFeedCommand());
+    backupManual.leftBumper().whileTrue(new IntakeIn(intake));
+    backupManual.start().whileTrue(stopMotorsAll());
 
 
 
-    second.rightBumper().whileTrue(shooterPivot.shooterPositionDownCommand());
-    second.leftBumper().whileTrue(shooterPivot.shooterPositionUpCommand());
 
-
-    second.start().whileTrue(stopMotors());
-
-    second.back().toggleOnTrue(SpeakerRightSequence());
-    second.b().toggleOnTrue(SpeakerLeftSequence());
-    second.x().toggleOnTrue(SpeakerCenterSequence());
-
-    second.a().toggleOnTrue(Source1Sequence());
 
 
 

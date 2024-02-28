@@ -25,10 +25,10 @@ public class IntakePulley extends SubsystemBase {
 
    
 
-    pulleyMotorPIDController.setP(1);
-    pulleyMotorPIDController.setP(0);
-    pulleyMotorPIDController.setP(0);
-    pulleyMotorPIDController.setP(0);
+    pulleyMotorPIDController.setP(.1);
+    pulleyMotorPIDController.setI(0);
+    pulleyMotorPIDController.setD(0);
+    pulleyMotorPIDController.setFF(0);
 
   
 
@@ -44,6 +44,20 @@ public class IntakePulley extends SubsystemBase {
     pulleyMotor.set(0);
   }
 
+  public void intakePositionGround(){
+    pulleyMotorPIDController.setReference(Constants.IntakeConstants.intakePositionGround, CANSparkMax.ControlType.kPosition);
+  }
+  public void intakePositionFeed(){
+    pulleyMotorPIDController.setReference(Constants.IntakeConstants.intakePositionFeed, CANSparkMax.ControlType.kPosition);
+  }
+
+  
+  public Command intakePositionGroundCommand(){
+    return run(() -> intakePositionGround()).until(() -> (Math.abs(pulleyMotorEncoder.getPosition() - Constants.IntakeConstants.intakePositionGround) < 1));
+  }
+  public Command intakePositionFeedCommand(){
+    return run(() -> intakePositionFeed()).until(() -> (Math.abs(pulleyMotorEncoder.getPosition() - Constants.IntakeConstants.intakePositionFeed) < 1));
+  }
 
 
 

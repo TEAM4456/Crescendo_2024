@@ -62,6 +62,9 @@ public class ShooterPivot extends SubsystemBase {
   public void shooterPositionSource(){
     pivotMotorPIDController.setReference(Constants.ShooterPivotPositions.shooterPositionSource, CANSparkMax.ControlType.kPosition);
   }
+  public void shooterPositionAmp(){
+    pivotMotorPIDController.setReference(Constants.ShooterPivotPositions.shooterPositionAmp, CANSparkMax.ControlType.kPosition);
+  }
 
   
   public Command shooterPositionDownCommand(){
@@ -78,6 +81,9 @@ public class ShooterPivot extends SubsystemBase {
   }
   public Command shooterPositionSourceCommand(){
     return run(() -> shooterPositionSource()).until(() -> (Math.abs(pivotMotorEncoder.getPosition() - Constants.ShooterPivotPositions.shooterPositionSource) < 1));
+  }
+  public Command shooterPositionAmpCommand(){
+    return run(() -> shooterPositionAmp()).until(() -> (Math.abs(pivotMotorEncoder.getPosition() - Constants.ShooterPivotPositions.shooterPositionAmp) < 1));
   }
  
 

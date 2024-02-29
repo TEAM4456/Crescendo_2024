@@ -428,6 +428,8 @@ public class RobotContainer {
     backupManual.leftBumper().whileTrue(new IntakeIn(intake));
     backupManual.start().whileTrue(stopMotorsAll());
 
+    backupManual.x().whileTrue(new MoveIntakeIn(intakePulley));
+
 
 
 

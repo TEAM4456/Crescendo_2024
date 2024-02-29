@@ -29,6 +29,7 @@ import frc.robot.Commands.ElevatorDown;
 import frc.robot.Commands.ElevatorUp;
 import frc.robot.Commands.FeedForward;
 import frc.robot.Commands.FeedForwardContinuous;
+import frc.robot.Commands.HatchOpener;
 import frc.robot.Commands.IntakeIn;
 import frc.robot.Commands.IntakeInContinuous;
 import frc.robot.Commands.MoveIntakeIn;
@@ -165,7 +166,25 @@ public class RobotContainer {
       return new SequentialCommandGroup(
         new ParallelCommandGroup(
            shooterPivot.shooterPositionSourceCommand(),
-           AutoBuilder.followPath(PathPlannerPath.fromPathFile("Source 1")),
+           AutoBuilder.followPath(PathPlannerPath.fromPathFile("Source Far")),
+           new InstantCommand(()->shooter.shooterIntake())
+           )
+      );
+    }
+    public Command SourceMidSequence(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+           shooterPivot.shooterPositionSourceCommand(),
+           AutoBuilder.followPath(PathPlannerPath.fromPathFile("Source Middle")),
+           new InstantCommand(()->shooter.shooterIntake())
+           )
+      );
+    }
+     public Command SourceCloseSequence(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+           shooterPivot.shooterPositionSourceCommand(),
+           AutoBuilder.followPath(PathPlannerPath.fromPathFile("Source Close")),
            new InstantCommand(()->shooter.shooterIntake())
            )
       );
@@ -388,8 +407,8 @@ public class RobotContainer {
 
     driver.start().whileTrue(stopMotorsAll());
 
-    //buttonBoard.a().whileTrue(SourceMidSequence()); Will be Source Middle
-    //buttonBoard.b().whileTrue(SourceCloseSequence());
+    buttonBoard.a().whileTrue(SourceMidSequence()); 
+    buttonBoard.b().whileTrue(SourceCloseSequence());
     buttonBoard.leftTrigger().whileTrue(SourceFarSequence());
 
     buttonBoard.leftBumper().whileTrue(SpeakerLeftSequence());
@@ -397,7 +416,7 @@ public class RobotContainer {
     buttonBoard.y().whileTrue(SpeakerRightSequence());
 
     buttonBoard.rightBumper().whileTrue(AmpScoreSequence());
-    buttonBoard.rightTrigger().whileTrue(stopMotors());
+    buttonBoard.rightTrigger().whileTrue(new HatchOpener(shooter));
 
 
     backupManual.y().whileTrue(new ShooterOn(shooter));

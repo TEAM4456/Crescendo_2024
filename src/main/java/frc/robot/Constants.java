@@ -161,7 +161,7 @@ public final class Constants {
     public static final double leftElevatorUp = 68.8;
     public static final double leftElevatorDown = 0;
 
-    public static final double elevatorSpeed = .1;
+    public static final double elevatorSpeed = .3;
   }
   public static final class ShooterConstants{
     public static final double feedSpeed = .38;
@@ -181,13 +181,13 @@ public final class Constants {
   }
 
   public static final class ShooterPivotPositions{
-    public static final double shooterPivotSpeed = .1;
+    public static final double shooterPivotSpeed = .5;
     public static final double shooterPositionSource = -87.3;
     public static final double shooterPositionShootCenter = -30.285;
     public static final double shooterPositionShootSide = -24.38;
     public static final double shooterPositionAmp = 0;
     public static final double shooterPositionTrapDoor = 0;
-    public static final double shooterPositionDown = -149;
+    public static final double shooterPositionDown = -150.3;
     public static final double shooterPositionUp = 0;
   
 

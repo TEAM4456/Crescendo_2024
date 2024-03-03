@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.time.Instant;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathHolonomic;
@@ -25,10 +27,12 @@ import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.ShooterPivot;
 import frc.robot.Subsystems.Swerve;
 import frc.robot.Commands.toggleSpeed;
+import frc.robot.Commands.DumpOutIntake;
 import frc.robot.Commands.ElevatorDown;
 import frc.robot.Commands.ElevatorUp;
 import frc.robot.Commands.FeedForward;
 import frc.robot.Commands.FeedForwardContinuous;
+import frc.robot.Commands.FeedIn;
 import frc.robot.Commands.HatchOpener;
 import frc.robot.Commands.IntakeIn;
 import frc.robot.Commands.IntakeInContinuous;
@@ -295,6 +299,23 @@ public class RobotContainer {
       autoCenter3Piece()
     );}
 
+    public Command autoCenter123(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+          shooterPivot.shooterPositionCenterCommand(),
+          new InstantCommand(()->shooter.shooterOn()),
+          intakePulley.intakePositionGroundCommand()
+      ),
+      new InstantCommand(()-> shooter.feedForward()),
+      new InstantCommand(() -> intake.intakeFeedForward()),
+      new InstantCommand(()-> intake.speedForward()),
+      new WaitCommand(.5),
+      autoCenter2Piece(),
+      new WaitCommand(1),
+      autoCenter1Piece(),
+      new WaitCommand(1),
+      autoCenter3Piece()
+    );}
 
     //Amp Side Auto 
     public Command autoAmpSide1(){
@@ -353,6 +374,24 @@ public class RobotContainer {
         new InstantCommand(()-> intake.speedForward())
       );
     }
+    public Command autoSideShootNothing(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+          shooterPivot.shooterPositionCornerCommand(),
+          new InstantCommand(()->shooter.shooterOn())
+      ),
+      new InstantCommand(()-> shooter.feedForward())
+      );
+    }
+    public Command autoCenterShootNothing(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+          shooterPivot.shooterPositionCenterCommand(),
+          new InstantCommand(()->shooter.shooterOn())
+      ),
+      new InstantCommand(()-> shooter.feedForward())
+      );
+    }
     
 
     //stop Feed and Shoot Motors
@@ -371,7 +410,14 @@ public class RobotContainer {
         new InstantCommand(()-> intake.speedStop())
       );
     }
-    
+    public Command ShootCenter(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+        shooterPivot.shooterPositionCenterCommand(),
+        new InstantCommand(()->shooter.shooterOn())),
+        new InstantCommand(()->shooter.feedForward()));
+        
+    }
 
 
   
@@ -383,6 +429,9 @@ public class RobotContainer {
     chooser.addOption("Center 2-3",autoCenter23());
     chooser.addOption("Amp Side 1",autoAmpSide1());
     chooser.addOption("Source Side 3",autoSourceSide3());
+    chooser.addOption("Side Shoot Nothing",autoSideShootNothing());
+    chooser.addOption("Center Shoot Nothing", autoCenterShootNothing());
+    chooser.addOption("Center 1-2-3",autoCenter123());
     /* Driver Buttons */
     driver.back().toggleOnTrue(
       new toggleSpeed(
@@ -415,8 +464,8 @@ public class RobotContainer {
     buttonBoard.x().whileTrue(SpeakerCenterSequence());
     buttonBoard.y().whileTrue(SpeakerRightSequence());
 
-    buttonBoard.rightBumper().whileTrue(AmpScoreSequence());
-    buttonBoard.rightTrigger().whileTrue(new HatchOpener(shooter));
+    buttonBoard.rightBumper().whileTrue(new FeedIn(shooter, intake));
+    buttonBoard.rightTrigger().whileTrue(ShootCenter());
 
 
     backupManual.y().whileTrue(new ShooterOn(shooter));
@@ -427,8 +476,9 @@ public class RobotContainer {
     backupManual.leftTrigger().whileTrue(intakePulley.intakePositionFeedCommand());
     backupManual.leftBumper().whileTrue(new IntakeIn(intake));
     backupManual.start().whileTrue(stopMotorsAll());
+    backupManual.back().whileTrue(new DumpOutIntake(shooter, intake));
 
-    backupManual.x().whileTrue(new MoveIntakeIn(intakePulley));
+    backupManual.x().whileTrue(new ShooterIntake(shooter));
 
 
 

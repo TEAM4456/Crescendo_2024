@@ -72,7 +72,7 @@ public class Swerve extends SubsystemBase {
     fieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
         
     var stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
-    var visionStdDevs = VecBuilder.fill(1, 1, 1);
+    var visionStdDevs = VecBuilder.fill(.1, .1, .1);
   
      
     swervePoseEstimator =

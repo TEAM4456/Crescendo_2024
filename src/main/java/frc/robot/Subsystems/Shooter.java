@@ -58,6 +58,9 @@ public class Shooter extends SubsystemBase {
   public void feedStop(){
     feeder.set(0);
   }
+  public void feedBack(){
+    feeder.set(Constants.ShooterConstants.feedSpeed);
+  }
   public void hatchForward(){
     hatch.set(.1);
   }

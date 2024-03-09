@@ -16,9 +16,11 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Commands.TeleopSwerve;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
@@ -98,7 +100,23 @@ public class RobotContainer {
     chooser = new SendableChooser<Command>();
     SmartDashboard.putData("Auto:", chooser);
 
+    //sysID config for Robot Characterization
+        var sysIdRoutine = new SysIdRoutine(
+        new SysIdRoutine.Config(),
+        new SysIdRoutine.Mechanism(
+            (voltage) -> s_Swerve.runVolts(voltage),
+            null, // No log consumer, since data is recorded by URCL
+            s_Swerve));
 
+      chooser.addOption("Quasi Forward",
+          sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward));
+      chooser.addOption("Quasi Backward",
+          sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
+      chooser.addOption("Dynamic Forward",
+          sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward));
+      chooser.addOption("Dynamic Backward",
+          sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+      Shuffleboard.getTab("Tune").add("SysID Drivetrain", chooser);
 
 
 

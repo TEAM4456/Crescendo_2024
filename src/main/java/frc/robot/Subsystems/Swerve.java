@@ -29,6 +29,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -220,7 +222,11 @@ public class Swerve extends SubsystemBase {
     return photonPose.update();
   }
   
-
+  public void runVolts(Measure<Voltage> voltage)  {    
+    for (SwerveModule mod : mSwerveMods) {
+      mod.runVolts(voltage);
+    }
+  }
  
   @Override
   public void periodic() {

@@ -16,6 +16,8 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Voltage;
 import frc.lib.configs.SwerveModuleConstants;
 import frc.lib.math.OnboardModuleState;
 import frc.lib.util.CANCoderUtil;
@@ -160,5 +162,9 @@ public class SwerveModule {
     return new SwerveModulePosition(driveEncoder.getPosition(), getAngle());
   }
 
+  public void runVolts(Measure<Voltage> voltage) {
+    driveMotor.setVoltage(voltage.magnitude());
+    angleController.setReference(0, ControlType.kPosition);
+  }
 
 }

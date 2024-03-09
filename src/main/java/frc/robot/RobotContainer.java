@@ -26,6 +26,7 @@ import frc.robot.Subsystems.IntakePulley;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.ShooterPivot;
 import frc.robot.Subsystems.Swerve;
+import frc.robot.Subsystems.Vision;
 import frc.robot.Commands.toggleSpeed;
 import frc.robot.Commands.DumpOutIntake;
 import frc.robot.Commands.ElevatorDown;
@@ -70,7 +71,8 @@ public class RobotContainer {
  //     new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
 
   /* Subsystems */
-  private final Swerve s_Swerve = new Swerve();
+  private final Vision vision = new Vision();
+  private final Swerve s_Swerve = new Swerve(vision);
   private final Shooter shooter = new Shooter();
   private final Elevator elevator = new Elevator();
   private final ShooterPivot shooterPivot = new ShooterPivot();
@@ -474,11 +476,12 @@ public class RobotContainer {
 
     backupManual.rightTrigger().whileTrue(intakePulley.intakePositionGroundCommand());
     backupManual.leftTrigger().whileTrue(intakePulley.intakePositionFeedCommand());
-    backupManual.leftBumper().whileTrue(new IntakeIn(intake));
-    backupManual.start().whileTrue(stopMotorsAll());
+    backupManual.leftBumper().toggleOnTrue(new IntakeIn(intake));
+    backupManual.start().whileTrue(new MoveIntakeOut(intakePulley));
     backupManual.back().whileTrue(new DumpOutIntake(shooter, intake));
 
     backupManual.x().whileTrue(new ShooterIntake(shooter));
+  
 
 
 

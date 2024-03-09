@@ -25,7 +25,7 @@ public class ShooterPivot extends SubsystemBase {
 
    
 
-    pivotMotorPIDController.setP(.1);
+    pivotMotorPIDController.setP(.5);
     pivotMotorPIDController.setI(0);
     pivotMotorPIDController.setD(0);
     pivotMotorPIDController.setFF(0);

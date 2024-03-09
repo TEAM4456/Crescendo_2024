@@ -3,6 +3,8 @@ package frc.robot;
 import java.util.HashMap;
 
 import com.revrobotics.CANSparkBase.IdleMode;
+
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -164,17 +166,16 @@ public final class Constants {
     public static final double elevatorSpeed = .3;
   }
   public static final class ShooterConstants{
-    public static final double feedSpeed = .38;
+    public static final double feedSpeed = .50;
     public static final double shootSpeed = .70;
     public static final double intakeSpeed = .3;
     public static final double ampSpeed = .25;
   }
   public static final class IntakeConstants{
-    public static final double intakeSpeed = 0.5
-  ;
+    public static final double intakeSpeed = 0.5;
     public static final double intakeFeedSpeed = .5;
 
-    public static final double intakePositionGround = -60;
+    public static final double intakePositionGround = -61;
     public static final double intakePositionFeed = 0;
     public static final double pulleySpeed = .25;
     
@@ -196,8 +197,8 @@ public final class Constants {
 
   public static final class VisionConstants {
     public static final Transform3d ROBOT_TO_LIMELIGHT1 = new Transform3d(
-        new Translation3d(-.35, .15,.1), new Rotation3d(Math.toRadians(-43), Math.toRadians(180), 0));
+        new Translation3d(-.35, -.15,.22), new Rotation3d(Math.toRadians(-43), Math.toRadians(180), 0));
     public static final Transform3d ROBOT_TO_LIMELIGHT2 = new Transform3d(
-        new Translation3d(1, 1, 1), new Rotation3d(0, Math.toRadians(0), 0));
+        new Translation3d(.04, .28, 1.03), new Rotation3d(0, Math.toRadians(180), 0));
   }
 }

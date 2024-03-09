@@ -6,6 +6,8 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -22,6 +24,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -29,6 +32,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -40,18 +44,17 @@ import frc.robot.Constants;
 public class Swerve extends SubsystemBase {
   private final AHRS m_gyro;
 
-  private SwerveDriveOdometry swerveOdometry;
+ 
   private SwerveModule[] mSwerveMods;
   private SwerveDrivePoseEstimator swervePoseEstimator;
-  private PhotonPoseEstimator photonPose;
-  private PhotonCamera camera;
-  private AprilTagFieldLayout fieldLayout;
   public Field2d field;
 
-
+  public Vision photonVision = new Vision();
+ 
   
 
-  public Swerve() {
+  public Swerve(Vision v) {
+    this.photonVision = v;
     m_gyro = new AHRS(SPI.Port.kMXP);
     //.configFactoryDefault();
     zeroHeading();
@@ -66,13 +69,13 @@ public class Swerve extends SubsystemBase {
     Timer.delay(1.0);
     resetModulesToAbsolute();
 
-    swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getRotation2d(), getModulePositions());
+
 
     field = new Field2d();
-    fieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+
         
-    var stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
-    var visionStdDevs = VecBuilder.fill(.1, .1, .1);
+    var stateStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(5));
+    var visionStdDevs = VecBuilder.fill(0.01, 0.01, Units.degreesToRadians(10));
   
      
     swervePoseEstimator =
@@ -84,9 +87,6 @@ public class Swerve extends SubsystemBase {
                     stateStdDevs,
                     visionStdDevs);
 
-    camera = new PhotonCamera("limelight");
-    photonPose = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, Constants.VisionConstants.ROBOT_TO_LIMELIGHT1);
-    photonPose.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
 
     SmartDashboard.putData("Field", field);
@@ -216,9 +216,7 @@ public class Swerve extends SubsystemBase {
         System.out.println("Modules Reset to Absolute");
       }
   }
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-    return photonPose.update();
-  }
+  
   
 
  
@@ -227,27 +225,33 @@ public class Swerve extends SubsystemBase {
     swervePoseEstimator.update(getRotation2d(), getModulePositions());
 
      // Correct pose estimate with vision measurements
-    SmartDashboard.putNumber("poseY", field.getRobotPose().getY());
+    SmartDashboard.putNumber("poseY", getPose().getY());
+    SmartDashboard.putNumber("poseX", getPose().getX());
     SmartDashboard.putNumber("NAVX Heading", this.getHeading());
+    /* 
+    Optional<EstimatedRobotPose> visionEstimateAngle = photonVision.getEstimatedPoseAngle();
+    if(visionEstimateAngle.isPresent()){
+      swervePoseEstimator.addVisionMeasurement(visionEstimateAngle.get().estimatedPose.toPose2d(), visionEstimateAngle.get().timestampSeconds);
+      SmartDashboard.putNumber("Angle Estimate X",visionEstimateAngle.get().estimatedPose.toPose2d().getX());
+      SmartDashboard.putNumber("Angle Estimate Y",visionEstimateAngle.get().estimatedPose.toPose2d().getY());
 
+    }*/
+    Optional<EstimatedRobotPose> visionEstimateFront = photonVision.getEstimatedPoseFront();
+  
+    if(visionEstimateFront.isPresent()){
+      swervePoseEstimator.addVisionMeasurement(visionEstimateFront.get().estimatedPose.toPose2d(), visionEstimateFront.get().timestampSeconds);
 
-    Optional<EstimatedRobotPose> result = getEstimatedGlobalPose();
-    if (result.isPresent()) {
-      var imageCaptureTime = result.get().timestampSeconds;
-      var estPose = result.get().estimatedPose;
-      swervePoseEstimator.addVisionMeasurement(
-              estPose.toPose2d(), imageCaptureTime);
+      SmartDashboard.putNumber("Front Estimate X",visionEstimateFront.get().estimatedPose.toPose2d().getX());
+      SmartDashboard.putNumber("Front Estimate Y",visionEstimateFront.get().estimatedPose.toPose2d().getY());
+      
+      
     }
+    SmartDashboard.putBoolean("Front Estimate Present",visionEstimateFront.isPresent());
+    SmartDashboard.putBoolean("Front AprilTag",visionEstimateFront.isPresent());
+
+
     field.setRobotPose(getPose());
-    SmartDashboard.putBoolean("has AprilTag", camera.getLatestResult().hasTargets());
-    SmartDashboard.putBoolean("has Pose Estimation", result.isPresent());
-    if(result.isPresent()){
-      SmartDashboard.putNumber("Vision Estimate X", result.get().estimatedPose.toPose2d().getX());
-      SmartDashboard.putNumber("Vision Estimate Y", result.get().estimatedPose.toPose2d().getY());
-    }
-
-
-
+  
    
     for (SwerveModule mod : mSwerveMods) {
       SmartDashboard.putNumber(

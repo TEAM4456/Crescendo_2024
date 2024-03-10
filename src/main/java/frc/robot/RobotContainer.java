@@ -126,8 +126,7 @@ public class RobotContainer {
            shooterPivot.shooterPositionCenterCommand(),
            AutoBuilder.followPath(PathPlannerPath.fromPathFile("Speaker Front")),
            new InstantCommand(()->shooter.shooterOn())
-           ),
-          new FeedForwardContinuous(shooter,intake)
+           )
       );
     }
 
@@ -137,8 +136,7 @@ public class RobotContainer {
            shooterPivot.shooterPositionCornerCommand(),
            AutoBuilder.followPath(PathPlannerPath.fromPathFile("Speaker Left")),
            new InstantCommand(()->shooter.shooterOn())
-           ),
-          new FeedForwardContinuous(shooter,intake)
+           )
       );
     }
 
@@ -148,8 +146,7 @@ public class RobotContainer {
            shooterPivot.shooterPositionCornerCommand(),
            AutoBuilder.followPath(PathPlannerPath.fromPathFile("Speaker Right")),
            new InstantCommand(()->shooter.shooterOn())
-           ),
-          new FeedForwardContinuous(shooter,intake)
+           )
       );
     }
 
@@ -313,9 +310,11 @@ public class RobotContainer {
       new InstantCommand(()-> intake.speedForward()),
       new WaitCommand(.5),
       autoCenter2Piece(),
-      new WaitCommand(1),
+      new WaitCommand(.75),
+      new ParallelCommandGroup(new WaitCommand(.25),intakePulley.intakePositionGroundCommand()),
       autoCenter1Piece(),
-      new WaitCommand(1),
+      new WaitCommand(.75),
+      new ParallelCommandGroup(new WaitCommand(.25),intakePulley.intakePositionGroundCommand()),
       autoCenter3Piece()
     );}
 

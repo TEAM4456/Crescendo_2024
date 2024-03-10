@@ -56,6 +56,8 @@ public class Elevator extends SubsystemBase {
   public void elevatorStop(){
     elevatorRight.set(0);
     elevatorLeft.set(0);
+    elevatorLeftPIDController.setReference(elevatorLeftEncoder.getPosition(), CANSparkMax.ControlType.kPosition);
+    elevatorRightPIDController.setReference(elevatorRightEncoder.getPosition(), CANSparkMax.ControlType.kPosition);
   }
 
 

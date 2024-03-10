@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.4,
-        "y": 4.15
+        "x": 2.368911784086914,
+        "y": 4.5964269389986
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7194867201122306,
-        "y": 4.947001875023917
+        "x": 2.3378235681738277,
+        "y": 4.653326171302403
       },
       "isLocked": false,
       "linkedName": null
@@ -28,7 +28,13 @@
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.7,
+      "rotationDegrees": 0.0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -45,7 +51,7 @@
   "reversed": false,
   "folder": "Auto Paths Center",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": -44.82821896906212,
     "velocity": 0
   },
   "useDefaultConstraints": true

@@ -65,13 +65,10 @@ public class Vision extends SubsystemBase {
     public Optional<EstimatedRobotPose> getEstimatedPoseFront() {
         PhotonPipelineResult result2 = camera2.getLatestResult();
         if(result2.hasTargets()){
-            PhotonTrackedTarget target = result2.getBestTarget();
-            if ((target.getPoseAmbiguity() <= 0.2 && target.getPoseAmbiguity() != -1 && target.getFiducialId() >=0)){
-                if(target.getBestCameraToTarget().getTranslation().getDistance(new Translation3d())<=3){
-                    Optional<EstimatedRobotPose> robotPose = photonPoseEstimatorFront.update();
-                    return robotPose;
-                }  
-            }
+         Optional<EstimatedRobotPose> robotPose = photonPoseEstimatorFront.update();
+         return robotPose;
+                  
+            
         }
         Optional<EstimatedRobotPose> emptyPose = Optional.empty();
         return emptyPose;

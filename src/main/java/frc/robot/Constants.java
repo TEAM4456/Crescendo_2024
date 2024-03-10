@@ -95,7 +95,7 @@ public final class Constants {
       public static final int angleMotorID = 4;
       public static final int driveMotorID = 5;
       public static final int canCoderID = 6;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(61.96+180);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(61.875+180);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -105,7 +105,7 @@ public final class Constants {
       public static final int angleMotorID = 7;
       public static final int driveMotorID = 8;
       public static final int canCoderID = 9;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(127.88+180);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(127.617+180);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -115,7 +115,7 @@ public final class Constants {
       public static final int angleMotorID = 1;
       public static final int driveMotorID = 2;
       public static final int canCoderID = 3;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(269.73+180);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(87.6269);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -125,7 +125,7 @@ public final class Constants {
       public static final int angleMotorID = 10;
       public static final int driveMotorID = 11;
       public static final int canCoderID = 12;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(355.42+180);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(350.5078+180);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -157,10 +157,10 @@ public final class Constants {
   }
 
   public static final class ElevatorPositions{
-    public static final double rightElevatorUp = -68.8;
+    public static final double rightElevatorUp = -150;
     public static final double rightElevatorDown = 0;
 
-    public static final double leftElevatorUp = 68.8;
+    public static final double leftElevatorUp = 150;
     public static final double leftElevatorDown = 0;
 
     public static final double elevatorSpeed = .3;
@@ -175,8 +175,8 @@ public final class Constants {
     public static final double intakeSpeed = 0.5;
     public static final double intakeFeedSpeed = .5;
 
-    public static final double intakePositionGround = -61;
-    public static final double intakePositionFeed = 0;
+    public static final double intakePositionGround = -69;
+    public static final double intakePositionFeed = -2;
     public static final double pulleySpeed = .25;
     
   }
@@ -190,6 +190,7 @@ public final class Constants {
     public static final double shooterPositionTrapDoor = 0;
     public static final double shooterPositionDown = -150.3;
     public static final double shooterPositionUp = 0;
+    public static final double shooterPositionCenterFar = 0;
   
 
 
@@ -199,6 +200,6 @@ public final class Constants {
     public static final Transform3d ROBOT_TO_LIMELIGHT1 = new Transform3d(
         new Translation3d(-.35, -.15,.22), new Rotation3d(Math.toRadians(-43), Math.toRadians(180), 0));
     public static final Transform3d ROBOT_TO_LIMELIGHT2 = new Transform3d(
-        new Translation3d(.04, .28, 1.03), new Rotation3d(0, Math.toRadians(180), 0));
+        new Translation3d(.04, 0, 1.10), new Rotation3d(0, Math.toRadians(180), 0));
   }
 }

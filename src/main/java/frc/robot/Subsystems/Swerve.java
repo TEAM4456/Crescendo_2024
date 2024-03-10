@@ -2,10 +2,7 @@ package frc.robot.Subsystems;
 
 import java.util.Optional;
 
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -45,8 +42,7 @@ public class Swerve extends SubsystemBase {
   private SwerveDriveOdometry swerveOdometry;
   private SwerveModule[] mSwerveMods;
   private SwerveDrivePoseEstimator swervePoseEstimator;
-  private PhotonPoseEstimator photonPose;
-  private PhotonCamera camera;
+
   private AprilTagFieldLayout fieldLayout;
   public Field2d field;
 
@@ -86,9 +82,6 @@ public class Swerve extends SubsystemBase {
                     stateStdDevs,
                     visionStdDevs);
 
-    camera = new PhotonCamera("limelight");
-    photonPose = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, Constants.VisionConstants.ROBOT_TO_LIMELIGHT1);
-    photonPose.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
 
     SmartDashboard.putData("Field", field);
@@ -218,9 +211,7 @@ public class Swerve extends SubsystemBase {
         System.out.println("Modules Reset to Absolute");
       }
   }
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-    return photonPose.update();
-  }
+ 
   
   public void runVolts(Measure<Voltage> voltage)  {    
     for (SwerveModule mod : mSwerveMods) {
@@ -231,28 +222,19 @@ public class Swerve extends SubsystemBase {
   @Override
   public void periodic() {
     swervePoseEstimator.update(getRotation2d(), getModulePositions());
-
+    
      // Correct pose estimate with vision measurements
     SmartDashboard.putNumber("poseY", field.getRobotPose().getY());
     SmartDashboard.putNumber("NAVX Heading", this.getHeading());
 
 
-    Optional<EstimatedRobotPose> result = getEstimatedGlobalPose();
-    if (result.isPresent()) {
-      var imageCaptureTime = result.get().timestampSeconds;
-      var estPose = result.get().estimatedPose;
-      swervePoseEstimator.addVisionMeasurement(
-              estPose.toPose2d(), imageCaptureTime);
-    }
+  
     field.setRobotPose(getPose());
-    SmartDashboard.putBoolean("has AprilTag", camera.getLatestResult().hasTargets());
-    SmartDashboard.putBoolean("has Pose Estimation", result.isPresent());
-    if(result.isPresent()){
-      SmartDashboard.putNumber("Vision Estimate X", result.get().estimatedPose.toPose2d().getX());
-      SmartDashboard.putNumber("Vision Estimate Y", result.get().estimatedPose.toPose2d().getY());
-    }
 
-
+    //if(result.isPresent()){
+    //  SmartDashboard.putNumber("Vision Estimate X", result.get().estimatedPose.toPose2d().getX());
+    //  SmartDashboard.putNumber("Vision Estimate Y", result.get().estimatedPose.toPose2d().getY());
+    //}
 
    
     for (SwerveModule mod : mSwerveMods) {
@@ -263,6 +245,7 @@ public class Swerve extends SubsystemBase {
       SmartDashboard.putNumber(
           "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
     }
- 
+    
+
   }
 }

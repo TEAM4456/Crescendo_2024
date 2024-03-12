@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -58,6 +59,7 @@ public class RobotContainer {
   private final CommandXboxController driver = new CommandXboxController(0);
   private final CommandXboxController buttonBoard = new CommandXboxController(1);
   private final CommandXboxController backupManual = new CommandXboxController(2);
+  private final CommandXboxController traptest = new CommandXboxController(3);
 
   /* Drive Controls */
   private final int translationAxis = XboxController.Axis.kLeftY.value;
@@ -480,6 +482,9 @@ public class RobotContainer {
     backupManual.back().whileTrue(new DumpOutIntake(shooter, intake));
 
     backupManual.x().whileTrue(new ShooterIntake(shooter));
+
+    traptest.y().whileTrue(new ShooterAmp(shooter));
+    traptest.b().whileTrue(new HatchOpener(shooter));
   
 
 

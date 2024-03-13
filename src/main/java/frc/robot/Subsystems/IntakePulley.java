@@ -50,8 +50,13 @@ public class IntakePulley extends SubsystemBase {
   public void intakePositionFeed(){
     pulleyMotorPIDController.setReference(Constants.IntakeConstants.intakePositionFeed, CANSparkMax.ControlType.kPosition);
   }
+  public void intakePositionClimb(){
+    pulleyMotorPIDController.setReference(Constants.IntakeConstants.intakePositionClimb, CANSparkMax.ControlType.kPosition);
+  }
 
-  
+  public Command intakePositionClimbCommand(){
+    return run(() -> intakePositionClimb()).until(() -> (Math.abs(pulleyMotorEncoder.getPosition() - Constants.IntakeConstants.intakePositionClimb) < 1));
+  }
   public Command intakePositionGroundCommand(){
     return run(() -> intakePositionGround()).until(() -> (Math.abs(pulleyMotorEncoder.getPosition() - Constants.IntakeConstants.intakePositionGround) < 1));
   }

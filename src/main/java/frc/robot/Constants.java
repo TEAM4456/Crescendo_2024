@@ -169,7 +169,13 @@ public final class Constants {
     public static final double feedSpeed = .50;
     public static final double shootSpeed = .70;
     public static final double intakeSpeed = .3;
-    public static final double ampSpeed = .25;
+    public static final double ampSpeed = .1;
+    public static final double hatchSpeed = .25;
+
+    public static final double hatchOpen = 7.5;
+    public static final double hatchClose = 0;
+    public static final double hatchAmp = -4.5;
+    
   }
   public static final class IntakeConstants{
     public static final double intakeSpeed = 0.5;
@@ -177,6 +183,7 @@ public final class Constants {
 
     public static final double intakePositionGround = -69;
     public static final double intakePositionFeed = -2;
+    public static final double intakePositionClimb = -13;
     public static final double pulleySpeed = .25;
     
   }
@@ -184,9 +191,9 @@ public final class Constants {
   public static final class ShooterPivotPositions{
     public static final double shooterPivotSpeed = .5;
     public static final double shooterPositionSource = -87.3;
-    public static final double shooterPositionShootCenter = -30.285;
-    public static final double shooterPositionShootSide = -24.38;
-    public static final double shooterPositionAmp = 0;
+    public static final double shooterPositionShootCenter = -33.285;
+    public static final double shooterPositionShootSide = -30;
+    public static final double shooterPositionAmp = -40;
     public static final double shooterPositionTrapDoor = 0;
     public static final double shooterPositionDown = -150.3;
     public static final double shooterPositionUp = 0;

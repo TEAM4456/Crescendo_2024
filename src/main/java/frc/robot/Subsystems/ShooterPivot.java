@@ -46,7 +46,9 @@ public class ShooterPivot extends SubsystemBase {
     pivotMotor.set(0);
     pivotMotor.set(0);
   }
-
+  public RelativeEncoder getPivotEncoder(){
+    return pivotMotorEncoder;
+  }
   public void shooterPositionDown(){
     pivotMotorPIDController.setReference(Constants.ShooterPivotPositions.shooterPositionDown, CANSparkMax.ControlType.kPosition);
   }

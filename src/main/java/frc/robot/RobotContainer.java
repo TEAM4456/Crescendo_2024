@@ -56,8 +56,9 @@ import frc.robot.Commands.ShooterUp;
 public class RobotContainer {
   /* Controllers */
   private final CommandXboxController driver = new CommandXboxController(0);
-  private final CommandXboxController buttonBoard = new CommandXboxController(1);
-  private final CommandXboxController backupManual = new CommandXboxController(2);
+  private final CommandXboxController second = new CommandXboxController(1);
+  private final CommandXboxController backup = new CommandXboxController(2);
+
 
   /* Drive Controls */
   private final int translationAxis = XboxController.Axis.kLeftY.value;
@@ -130,7 +131,7 @@ public class RobotContainer {
       );
     }
 
-    public Command SpeakerRightSequence(){
+    public Command SpeakerSourceSequence(){
       return new SequentialCommandGroup(
         new ParallelCommandGroup(
            shooterPivot.shooterPositionCornerCommand(),
@@ -140,7 +141,7 @@ public class RobotContainer {
       );
     }
 
-    public Command SpeakerLeftSequence(){
+    public Command SpeakerAmpSequence(){
       return new SequentialCommandGroup(
         new ParallelCommandGroup(
            shooterPivot.shooterPositionCornerCommand(),
@@ -419,8 +420,29 @@ public class RobotContainer {
         new InstantCommand(()->shooter.feedForward()));
         
     }
+    public Command hatchSequence(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+          new InstantCommand(()->shooter.shooterHatch()),
+          shooter.hatchPositionOpenCommand()
+        ),
+        new InstantCommand(()->shooter.hatchStop()),
+        new WaitCommand(.5),
+        new InstantCommand(()->shooter.feedForward()),
+        new WaitCommand(.5),
+        shooter.hatchPositionCloseCommand()
+      );
+    }
 
-
+    public Command ampSequence(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+          new InstantCommand(()->shooter.shooterAmp()),
+          shooter.hatchPositionAmpCommand()
+        ),
+        new InstantCommand(()->shooter.feedForward())
+      );
+    }
   
   private void configureButtonBindings() {
     chooser.setDefaultOption("nothing", null);
@@ -441,46 +463,48 @@ public class RobotContainer {
         () -> -driver.getRawAxis(strafeAxis),
         () -> driver.getRawAxis(rotationAxis)));
  
-    driver.leftTrigger().whileTrue(elevator.setElevatorPositionDownCommand());
-    driver.rightTrigger().whileTrue(elevator.setElevatorPositionUpCommand());
+    driver.rightTrigger().whileTrue(new ParallelCommandGroup(shooterPivot.shooterPositionUpCommand(),new FeedIn(shooter, intake),intakePulley.intakePositionFeedCommand(),shooter.hatchPositionCloseCommand()));
+    driver.leftTrigger().whileTrue(SourceMidSequence());
+    driver.rightBumper().whileTrue(SourceFarSequence());
+    driver.leftBumper().whileTrue(SourceCloseSequence());
 
-    driver.rightBumper().whileTrue(new ElevatorUp(elevator));
-    driver.leftBumper().whileTrue(new ElevatorDown(elevator));
-
-
-    driver.b().whileTrue(shooterPivot.shooterPositionUpCommand());
-    driver.x().whileTrue(shooterPivot.shooterPositionDownCommand());
-    
-    driver.y().whileTrue(new ShooterUp(shooterPivot));
-    driver.a
-    ().whileTrue(new ShooterDown(shooterPivot));
-
+    driver.y().whileTrue(SpeakerCenterSequence());
+    driver.x().whileTrue(SpeakerSourceSequence());
+    driver.b().whileTrue(SpeakerAmpSequence());
+    driver.a().whileTrue(new FeedForward(shooter, intake));
+  
     driver.start().whileTrue(stopMotorsAll());
 
-    buttonBoard.a().whileTrue(SourceMidSequence()); 
-    buttonBoard.b().whileTrue(SourceCloseSequence());
-    buttonBoard.leftTrigger().whileTrue(SourceFarSequence());
+    second.back().toggleOnTrue(
+      new toggleSpeed(
+        s_Swerve,
+        () -> -second.getRawAxis(translationAxis),
+        () -> -second.getRawAxis(strafeAxis),
+        () -> second.getRawAxis(rotationAxis)));
 
-    buttonBoard.leftBumper().whileTrue(SpeakerLeftSequence());
-    buttonBoard.x().whileTrue(SpeakerCenterSequence());
-    buttonBoard.y().whileTrue(SpeakerRightSequence());
+    second.leftTrigger().whileTrue(elevator.setElevatorPositionDownCommand());
+    second.rightTrigger().whileTrue(new ParallelCommandGroup(elevator.setElevatorPositionUpCommand(),intakePulley.intakePositionClimbCommand()));
+    second.leftBumper().whileTrue(new ElevatorDown(elevator));
+    second.rightBumper().whileTrue(new ElevatorUp(elevator));
 
-    buttonBoard.rightBumper().whileTrue(new FeedIn(shooter, intake));
-    buttonBoard.rightTrigger().whileTrue(ShootCenter());
+    second.start().whileTrue(hatchSequence());
+    second.b().whileTrue(shooterPivot.shooterPositionUpCommand());
+    second.x().whileTrue(shooterPivot.shooterPositionDownCommand());
+    second.y().whileTrue(new ShooterUp(shooterPivot));
+    second.a().whileTrue(new ShooterDown(shooterPivot));
+
+    backup.start().whileTrue(ampSequence());
+    backup.a().whileTrue(new InstantCommand(()->shooter.shooterAmp()));
+    backup.x().whileTrue(shooterPivot.shooterPositionAmpCommand());
+    backup.y().whileTrue(new InstantCommand(()->shooter.feedForwardSlow()));
+    backup.b().whileTrue(shooter.hatchPositionAmpCommand());
+    backup.back().whileTrue(stopMotors());
+
+    
+    
 
 
-    backupManual.y().whileTrue(new ShooterOn(shooter));
-    backupManual.a().whileTrue(new FeedForward(shooter, intake));
-    backupManual.b().whileTrue(shooterPivot.shooterPositionCenterCommand());
-
-    backupManual.rightTrigger().whileTrue(intakePulley.intakePositionGroundCommand());
-    backupManual.leftTrigger().whileTrue(intakePulley.intakePositionFeedCommand());
-    backupManual.leftBumper().toggleOnTrue(new IntakeIn(intake));
-    backupManual.start().whileTrue(new MoveIntakeOut(intakePulley));
-    backupManual.back().whileTrue(new DumpOutIntake(shooter, intake));
-
-    backupManual.x().whileTrue(new ShooterIntake(shooter));
-  
+   
 
 
 

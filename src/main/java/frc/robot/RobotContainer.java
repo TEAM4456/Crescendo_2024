@@ -455,7 +455,12 @@ public class RobotContainer {
     chooser.addOption("Side Shoot Nothing",autoSideShootNothing());
     chooser.addOption("Center Shoot Nothing", autoCenterShootNothing());
     chooser.addOption("Center 1-2-3",autoCenter123());
+    
     /* Driver Buttons */
+
+//Commenting out all button bindings that require picking 
+//up an April Tag for Open House
+
     driver.back().toggleOnTrue(
       new toggleSpeed(
         s_Swerve,
@@ -464,13 +469,13 @@ public class RobotContainer {
         () -> driver.getRawAxis(rotationAxis)));
  
     driver.rightTrigger().whileTrue(new ParallelCommandGroup(shooterPivot.shooterPositionUpCommand(),new FeedIn(shooter, intake),intakePulley.intakePositionFeedCommand(),shooter.hatchPositionCloseCommand()));
-    driver.leftTrigger().whileTrue(SourceMidSequence());
-    driver.rightBumper().whileTrue(SourceFarSequence());
-    driver.leftBumper().whileTrue(SourceCloseSequence());
+    //driver.leftTrigger().whileTrue(SourceMidSequence());
+    //driver.rightBumper().whileTrue(SourceFarSequence());
+   // driver.leftBumper().whileTrue(SourceCloseSequence());
 
-    driver.y().whileTrue(SpeakerCenterSequence());
-    driver.x().whileTrue(SpeakerSourceSequence());
-    driver.b().whileTrue(SpeakerAmpSequence());
+   // driver.y().whileTrue(SpeakerCenterSequence());
+   // driver.x().whileTrue(SpeakerSourceSequence());
+   // driver.b().whileTrue(SpeakerAmpSequence());
     driver.a().whileTrue(new FeedForward(shooter, intake));
   
     driver.start().whileTrue(stopMotorsAll());
@@ -499,6 +504,9 @@ public class RobotContainer {
     backup.y().whileTrue(new InstantCommand(()->shooter.feedForwardSlow()));
     backup.b().whileTrue(shooter.hatchPositionAmpCommand());
     backup.back().whileTrue(stopMotors());
+
+    //Below are newly made buttons for use to accomplish demo things 
+    //at Open House
 
     
     

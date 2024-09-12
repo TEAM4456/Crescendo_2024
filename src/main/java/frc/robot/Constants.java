@@ -167,7 +167,10 @@ public final class Constants {
   }
   public static final class ShooterConstants{
     public static final double feedSpeed = .50;
-    public static final double shootSpeed = .70;
+    //public static final double shootSpeed = .70;
+    //for activities fair shoot speed was changed from 0.7 to 0.35
+    public static final double shootSpeed = .35;
+
     public static final double intakeSpeed = .3;
     public static final double ampSpeed = .1;
     public static final double hatchSpeed = .25;

@@ -468,7 +468,7 @@ public class RobotContainer {
         () -> -driver.getRawAxis(strafeAxis),
         () -> driver.getRawAxis(rotationAxis)));
  
-    driver.rightTrigger().whileTrue(new ParallelCommandGroup(shooterPivot.shooterPositionUpCommand(),new FeedIn(shooter, intake),intakePulley.intakePositionFeedCommand(),shooter.hatchPositionCloseCommand()));
+    //driver.rightTrigger().whileTrue(new ParallelCommandGroup(shooterPivot.shooterPositionUpCommand(),new FeedIn(shooter, intake),intakePulley.intakePositionFeedCommand(),shooter.hatchPositionCloseCommand()));
     //driver.leftTrigger().whileTrue(SourceMidSequence());
     //driver.rightBumper().whileTrue(SourceFarSequence());
    // driver.leftBumper().whileTrue(SourceCloseSequence());
@@ -476,39 +476,43 @@ public class RobotContainer {
    // driver.y().whileTrue(SpeakerCenterSequence());
    // driver.x().whileTrue(SpeakerSourceSequence());
    // driver.b().whileTrue(SpeakerAmpSequence());
-    driver.a().whileTrue(new FeedForward(shooter, intake));
+   // driver.a().whileTrue(new FeedForward(shooter, intake));
   
     driver.start().whileTrue(stopMotorsAll());
 
-    second.back().toggleOnTrue(
+    /*second.back().toggleOnTrue(
       new toggleSpeed(
         s_Swerve,
         () -> -second.getRawAxis(translationAxis),
         () -> -second.getRawAxis(strafeAxis),
-        () -> second.getRawAxis(rotationAxis)));
+        () -> second.getRawAxis(rotationAxis)));*/
 
-    second.leftTrigger().whileTrue(elevator.setElevatorPositionDownCommand());
-    second.rightTrigger().whileTrue(new ParallelCommandGroup(elevator.setElevatorPositionUpCommand(),intakePulley.intakePositionClimbCommand()));
-    second.leftBumper().whileTrue(new ElevatorDown(elevator));
-    second.rightBumper().whileTrue(new ElevatorUp(elevator));
+    //second.leftTrigger().whileTrue(elevator.setElevatorPositionDownCommand());
+    //second.rightTrigger().whileTrue(new ParallelCommandGroup(elevator.setElevatorPositionUpCommand(),intakePulley.intakePositionClimbCommand()));
+    //second.leftBumper().whileTrue(new ElevatorDown(elevator));
+    //second.rightBumper().whileTrue(new ElevatorUp(elevator));
 
-    second.start().whileTrue(hatchSequence());
-    second.b().whileTrue(shooterPivot.shooterPositionUpCommand());
-    second.x().whileTrue(shooterPivot.shooterPositionDownCommand());
-    second.y().whileTrue(new ShooterUp(shooterPivot));
-    second.a().whileTrue(new ShooterDown(shooterPivot));
+    //second.start().whileTrue(hatchSequence());
+    //second.b().whileTrue(shooterPivot.shooterPositionUpCommand());
+    //second.x().whileTrue(shooterPivot.shooterPositionDownCommand());
+    //second.y().whileTrue(new ShooterUp(shooterPivot));
+    //second.a().whileTrue(new ShooterDown(shooterPivot));
 
-    backup.start().whileTrue(ampSequence());
-    backup.a().whileTrue(new InstantCommand(()->shooter.shooterAmp()));
-    backup.x().whileTrue(shooterPivot.shooterPositionAmpCommand());
-    backup.y().whileTrue(new InstantCommand(()->shooter.feedForwardSlow()));
-    backup.b().whileTrue(shooter.hatchPositionAmpCommand());
-    backup.back().whileTrue(stopMotors());
+   // backup.start().whileTrue(ampSequence());
+   // backup.a().whileTrue(new InstantCommand(()->shooter.shooterAmp()));
+   // backup.x().whileTrue(shooterPivot.shooterPositionAmpCommand());
+   // backup.y().whileTrue(new InstantCommand(()->shooter.feedForwardSlow()));
+   // backup.b().whileTrue(shooter.hatchPositionAmpCommand());
+    //backup.back().whileTrue(stopMotors());
 
     //Below are newly made buttons for use to accomplish demo things 
     //at Open House
-
     
+    driver.a().whileTrue(new InstantCommand(()->shooter.shooterIntake()));
+    driver.y().whileTrue(new InstantCommand(()->shooter.shooterOn()));
+    driver.b().whileTrue(new FeedForward(shooter, intake));
+    driver.leftTrigger().whileTrue(new ShooterDown(shooterPivot));
+    driver.rightTrigger().whileTrue(new ShooterUp(shooterPivot));
     
 
 

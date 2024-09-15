@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.Subsystems;
 
 import java.util.Optional;
@@ -20,13 +24,15 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -35,10 +41,14 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 
 public class Swerve extends SubsystemBase {
@@ -128,6 +138,23 @@ public class Swerve extends SubsystemBase {
     }
   }
 
+/*  Drive with field relative boolean
+  public void drive(
+    Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+  SwerveModuleState[] swerveModuleStates =
+      Constants.Swerve.swerveKinematics.toSwerveModuleStates(
+          fieldRelative
+              ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                  translation.getX(), translation.getY(), rotation, getYaw())
+              : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
+  SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
+
+  for (SwerveModule mod : mSwerveMods) {
+    mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
+  }
+}
+*/
+
   /* Used by SwerveControllerCommand in Auto */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed);
@@ -138,13 +165,11 @@ public class Swerve extends SubsystemBase {
   }
 
   public Pose2d getPose() {
-    //return swerveOdometry.getPoseMeters();
-    return swervePoseEstimator.getEstimatedPosition();
+    return swerveOdometry.getPoseMeters();
   }
 
   public void resetPose(Pose2d pose) {
-    //swerveOdometry.resetPosition(getRotation2d(), getModulePositions(), pose);
-    swervePoseEstimator.resetPosition(getRotation2d(), getModulePositions(), pose);
+    swerveOdometry.resetPosition(getRotation2d(), getModulePositions(), pose);
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds(){
@@ -167,8 +192,7 @@ public class Swerve extends SubsystemBase {
   }
   
   public void resetOdometry(Pose2d pose) {
-    //swerveOdometry.resetPosition(getRotation2d(), getModulePositions(), pose);
-    swervePoseEstimator.resetPosition(getRotation2d(), getModulePositions(), pose);
+    swerveOdometry.resetPosition(getRotation2d(), getModulePositions(), pose);
   }
 
   public SwerveModuleState[] getStates() {
@@ -182,7 +206,6 @@ public class Swerve extends SubsystemBase {
   public void zeroHeading() {
     m_gyro.reset();
   }
-
   public void zeroHeadingAdjust() {
     m_gyro.reset();
     m_gyro.setAngleAdjustment(0);
@@ -193,7 +216,7 @@ public class Swerve extends SubsystemBase {
 
   public double getHeading() {
     return Math.IEEEremainder(-m_gyro.getAngle(), 360);
-  }
+}
   public double getGyroRoll(){
     return m_gyro.getRoll();
   }
@@ -201,6 +224,19 @@ public class Swerve extends SubsystemBase {
   public Rotation2d getRotation2d() {
     return m_gyro.getRotation2d();
   }
+/*
+public Rotation2d getRotation2d() {
+    return Rotation2d.fromDegrees(getHeading());
+}
+*/
+
+ /* 
+  public Rotation2d getYaw() {
+    return (Constants.Swerve.invertGyro)
+        ? Rotation2d.fromDegrees(360 - gyro.getYaw())
+        : Rotation2d.fromDegrees(gyro.getYaw());
+  }
+  */
 
   public SwerveModulePosition[] getModulePositions(){
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
@@ -208,7 +244,7 @@ public class Swerve extends SubsystemBase {
         positions[mod.moduleNumber] = mod.getPosition();
     }
     return positions;
-  }
+}
 
   public void resetModulesToAbsolute() {
       for(SwerveModule mod : mSwerveMods) {

@@ -4,23 +4,41 @@
 
 package frc.robot.Subsystems;
 
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,16 +54,20 @@ import frc.robot.Constants;
 public class Swerve extends SubsystemBase {
   private final AHRS m_gyro;
 
-  private SwerveDriveOdometry swerveOdometry;
+ 
   private SwerveModule[] mSwerveMods;
-  private PIDController m_balancePID = new PIDController(2, 0, 0);
-
+  private SwerveDrivePoseEstimator swervePoseEstimator;
   public Field2d field;
-  public Swerve() {
+
+  public Vision photonVision = new Vision();
+ 
+  
+
+  public Swerve(Vision v) {
+    this.photonVision = v;
     m_gyro = new AHRS(SPI.Port.kMXP);
     //.configFactoryDefault();
     zeroHeading();
-
     mSwerveMods =
         new SwerveModule[] {
           new SwerveModule(0, Constants.Swerve.Mod0.constants),
@@ -57,10 +79,26 @@ public class Swerve extends SubsystemBase {
     Timer.delay(1.0);
     resetModulesToAbsolute();
 
-    swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getRotation2d(), getModulePositions());
+
 
     field = new Field2d();
-    
+
+        
+    var stateStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(5));
+    var visionStdDevs = VecBuilder.fill(0.01, 0.01, Units.degreesToRadians(10));
+  
+     
+    swervePoseEstimator =
+            new SwerveDrivePoseEstimator(
+                    Constants.Swerve.swerveKinematics,
+                    getRotation2d(),
+                    getModulePositions(),
+                    new Pose2d(),
+                    stateStdDevs,
+                    visionStdDevs);
+
+
+
     SmartDashboard.putData("Field", field);
     AutoBuilder.configureHolonomic(
         this::getPose, // Robot pose supplier
@@ -88,13 +126,12 @@ public class Swerve extends SubsystemBase {
                 this // Reference to this subsystem to set requirements
         );
     }
-  public void drive(
-      Translation2d translation, double rotation, /*boolean fieldRelative,*/ boolean isOpenLoop) {
-    SwerveModuleState[] swerveModuleStates =
+  public void drive(Translation2d translation, double rotation, /*boolean fieldRelative,*/ boolean isOpenLoop) {
+      SwerveModuleState[] swerveModuleStates = 
         Constants.Swerve.swerveKinematics.toSwerveModuleStates(
             ChassisSpeeds.fromFieldRelativeSpeeds(
                     translation.getX(), translation.getY(), rotation, getRotation2d()));
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
+      SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
 
     for (SwerveModule mod : mSwerveMods) {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
@@ -215,13 +252,43 @@ public Rotation2d getRotation2d() {
         System.out.println("Modules Reset to Absolute");
       }
   }
+  
+  
 
-  // Assuming this is a method in your drive subsystem
+ 
   @Override
   public void periodic() {
-    swerveOdometry.update(getRotation2d(), getModulePositions());
-    field.setRobotPose(getPose());
+    swervePoseEstimator.update(getRotation2d(), getModulePositions());
 
+     // Correct pose estimate with vision measurements
+    SmartDashboard.putNumber("poseY", getPose().getY());
+    SmartDashboard.putNumber("poseX", getPose().getX());
+    SmartDashboard.putNumber("NAVX Heading", this.getHeading());
+    /* 
+    Optional<EstimatedRobotPose> visionEstimateAngle = photonVision.getEstimatedPoseAngle();
+    if(visionEstimateAngle.isPresent()){
+      swervePoseEstimator.addVisionMeasurement(visionEstimateAngle.get().estimatedPose.toPose2d(), visionEstimateAngle.get().timestampSeconds);
+      SmartDashboard.putNumber("Angle Estimate X",visionEstimateAngle.get().estimatedPose.toPose2d().getX());
+      SmartDashboard.putNumber("Angle Estimate Y",visionEstimateAngle.get().estimatedPose.toPose2d().getY());
+
+    }*/
+    Optional<EstimatedRobotPose> visionEstimateFront = photonVision.getEstimatedPoseFront();
+  
+    if(visionEstimateFront.isPresent()){
+      swervePoseEstimator.addVisionMeasurement(visionEstimateFront.get().estimatedPose.toPose2d(), visionEstimateFront.get().timestampSeconds);
+
+      SmartDashboard.putNumber("Front Estimate X",visionEstimateFront.get().estimatedPose.toPose2d().getX());
+      SmartDashboard.putNumber("Front Estimate Y",visionEstimateFront.get().estimatedPose.toPose2d().getY());
+      
+      
+    }
+    SmartDashboard.putBoolean("Front Estimate Present",visionEstimateFront.isPresent());
+    SmartDashboard.putBoolean("Front AprilTag",visionEstimateFront.isPresent());
+
+
+    field.setRobotPose(getPose());
+  
+   
     for (SwerveModule mod : mSwerveMods) {
       SmartDashboard.putNumber(
           "Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
@@ -230,8 +297,6 @@ public Rotation2d getRotation2d() {
       SmartDashboard.putNumber(
           "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
     }
-    SmartDashboard.putNumber("poseX", field.getRobotPose().getX());
-    SmartDashboard.putNumber("poseY", field.getRobotPose().getY());
-    SmartDashboard.putNumber("NAVX Heading", this.getHeading());
+ 
   }
 }

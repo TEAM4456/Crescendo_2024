@@ -169,7 +169,7 @@ public final class Constants {
     public static final double feedSpeed = .50;
     //public static final double shootSpeed = .70;
     //for activities fair shoot speed was changed from 0.7 to 0.35
-    public static final double shootSpeed = .35;
+    public static final double shootSpeed = .85;
 
     public static final double intakeSpeed = .3;
     public static final double ampSpeed = .1;
@@ -194,7 +194,9 @@ public final class Constants {
   public static final class ShooterPivotPositions{
     public static final double shooterPivotSpeed = .5;
     public static final double shooterPositionSource = -87.3;
-    public static final double shooterPositionShootCenter = -33.285;
+    //public static final double shooterPositionShootCenter = -33.285;
+    // comp ^^^    open house vvv
+    public static final double shooterPositionShootCenter = -75.285;
     public static final double shooterPositionShootSide = -30;
     public static final double shooterPositionAmp = -40;
     public static final double shooterPositionTrapDoor = 0;

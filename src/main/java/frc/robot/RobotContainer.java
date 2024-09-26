@@ -125,11 +125,21 @@ public class RobotContainer {
       return new SequentialCommandGroup(
         new ParallelCommandGroup(
            shooterPivot.shooterPositionCenterCommand(),
-           AutoBuilder.followPath(PathPlannerPath.fromPathFile("Speaker Front")),
+           
            new InstantCommand(()->shooter.shooterOn())
            )
       );
     }
+
+    /*public Command SpeakerCenterSequence(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+           shooterPivot.shooterPositionCenterCommand(),
+           AutoBuilder.followPath(PathPlannerPath.fromPathFile("Speaker Front")),
+           new InstantCommand(()->shooter.shooterOn())
+           )
+      );
+    } */
 
     public Command SpeakerSourceSequence(){
       return new SequentialCommandGroup(
@@ -140,6 +150,7 @@ public class RobotContainer {
            )
       );
     }
+
 
     public Command SpeakerAmpSequence(){
       return new SequentialCommandGroup(
@@ -165,7 +176,7 @@ public class RobotContainer {
     }
 
    
-    //Source Sequences
+    /*//Source Sequences
     public Command SourceFarSequence(){
       return new SequentialCommandGroup(
         new ParallelCommandGroup(
@@ -174,7 +185,17 @@ public class RobotContainer {
            new InstantCommand(()->shooter.shooterIntake())
            )
       );
+    }*/
+
+    public Command SourceFarSequence(){
+      return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+           shooterPivot.shooterPositionSourceCommand(),
+           new InstantCommand(()->shooter.shooterIntake())
+           )
+      );
     }
+
     public Command SourceMidSequence(){
       return new SequentialCommandGroup(
         new ParallelCommandGroup(
@@ -509,13 +530,14 @@ public class RobotContainer {
     //at Open House
     
     driver.a().whileTrue(new InstantCommand(()->shooter.shooterIntake()));
-    driver.y().whileTrue(new InstantCommand(()->shooter.shooterOn()));
+    //driver.y().whileTrue(new InstantCommand(()->shooter.shooterOn()));
     driver.b().whileTrue(new FeedForward(shooter, intake));
     driver.leftTrigger().whileTrue(new ShooterDown(shooterPivot));
     driver.rightTrigger().whileTrue(new ShooterUp(shooterPivot));
+    driver.rightBumper().whileTrue(new ParallelCommandGroup(shooterPivot.shooterPositionUpCommand(),new FeedIn(shooter, intake),intakePulley.intakePositionFeedCommand(),shooter.hatchPositionCloseCommand()));
     
-
-
+    driver.y().whileTrue(SpeakerCenterSequence());
+    driver.x().whileTrue(SourceFarSequence());
    
 
 

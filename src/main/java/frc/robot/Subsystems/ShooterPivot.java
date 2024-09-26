@@ -100,4 +100,5 @@ public class ShooterPivot extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Shooter Pivot Position",pivotMotorEncoder.getPosition());
 }
+   
 }

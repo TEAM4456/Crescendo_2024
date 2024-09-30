@@ -176,7 +176,7 @@ public class RobotContainer {
     }
 
    
-    /*//Source Sequences
+    //Source Sequences
     public Command SourceFarSequence(){
       return new SequentialCommandGroup(
         new ParallelCommandGroup(
@@ -185,16 +185,8 @@ public class RobotContainer {
            new InstantCommand(()->shooter.shooterIntake())
            )
       );
-    }*/
-
-    public Command SourceFarSequence(){
-      return new SequentialCommandGroup(
-        new ParallelCommandGroup(
-           shooterPivot.shooterPositionSourceCommand(),
-           new InstantCommand(()->shooter.shooterIntake())
-           )
-      );
     }
+
 
     public Command SourceMidSequence(){
       return new SequentialCommandGroup(
@@ -214,6 +206,8 @@ public class RobotContainer {
            )
       );
     }
+
+   
     //Auto Sequences Pieces Center
     public Command autoCenter2Piece(){
       return new SequentialCommandGroup(
@@ -537,7 +531,7 @@ public class RobotContainer {
     driver.rightBumper().whileTrue(new ParallelCommandGroup(shooterPivot.shooterPositionUpCommand(),new FeedIn(shooter, intake),intakePulley.intakePositionFeedCommand(),shooter.hatchPositionCloseCommand()));
     
     driver.y().whileTrue(SpeakerCenterSequence());
-    driver.x().whileTrue(SourceFarSequence());
+    driver.x().whileTrue(SourceCloseSequence());
    
 
 
